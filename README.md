@@ -2,6 +2,10 @@
 
 ![IC-R30 Webinterface](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/IC-R30%20Webinterface.PNG)
 
+## Donate
+Guys I know a lot of stuff on Github is free. But I would appreciate a small coffee donation. The project has taken time and grey hairs.
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/spotterday/10)
+
 ## Hardware requirements
 
 Based on the following document [RS-R30-Brochure](doc/RS-R30-Brochure.pdf), you will need a USB dongle which supports SPP (CI-V command）.
@@ -115,6 +119,15 @@ pi@R30:~/Webinterface_ICOM_R30-main/config $ nano default.json
   }
 }
 ```
+
+### Run Webinterface
+```
+pi@R30:~/Webinterface_ICOM_R30-main $ node client.js
+```
+
+### Run Webinterface as Service
+
+
 
 ## Known Issues
 

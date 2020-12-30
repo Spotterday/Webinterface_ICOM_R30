@@ -30,8 +30,10 @@ OS : Raspbian GNU/Linux 10 (buster) / Windows 10
 
 ### Disable onboard Bluetooth
 
-` # Add line to /boot/config.txt` 
-` dtoverlay=pi3-disable-bt`
+``` 
+# Add line to /boot/config.txt
+dtoverlay=pi3-disable-bt
+```
 
 `sudo systemctl disable hciuart.service`
 

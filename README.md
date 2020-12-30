@@ -276,5 +276,32 @@ e.g: http://192.168.10.2:3000
 
 ### Workaround Audio with VLC
 
+Connect your R30 via Cable and [USB Sound Card](https://amzn.to/2WXS3zu) (*Affiliate  Link*) to your PI
+
+```
+pi@R30:~ $ sudo apt-get install vlc
+pi@R30:~ $ sudo touch /lib/systemd/system/r30audio.service
+pi@R30:~ $ sudo nano /lib/systemd/system/r30audio.service
+
+[Unit]
+Description=R30audio
+After=syslog.target
+After=network.target
+
+[Service]
+RestartSec=2s
+Type=simple
+User=pi
+Group=pi
+ExecStart=/usr/bin/cvlc -vvv alsa://plughw:1,0 --sout '#transcode{acodec=mp3,ab=64,channels=1}:standard{access=http,dst=0.0.0.0:8888/r30.mp3}'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+pi@R30:~ $ sudo systemctl daemon-reload 
+pi@R30:~ $ sudo enable r30audio.service
+pi@R30:~ $ sudo systemctl start r30audio.service
+```
 
 

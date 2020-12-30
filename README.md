@@ -4,6 +4,10 @@ for Windows : [README_WIN.md](README_WIN.md)
 
 ![IC-R30 Webinterface](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/IC-R30%20Webinterface.PNG)
 
+## Contact and Support
+
+I try my best to support you - for contact use r30@spotterday.de - but no 24 hour support
+
 ## Donate
 Guys I know a lot of stuff on Github is free. But I would appreciate a small coffee donation. The project has taken time and grey hairs.
 

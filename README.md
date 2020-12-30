@@ -15,9 +15,13 @@ Guys I know a lot of stuff on Github is free. But I would appreciate a small cof
 
 ## Hardware requirements
 
+### USB Bluetooth Dongle
 Based on the following document [RS-R30-Brochure](doc/RS-R30-Brochure.pdf), you will need a USB dongle which supports SPP (CI-V command）.
 A possible USB dongel which works under Linux and Windows is this : [USB Dongle](https://amzn.to/3o0EV8l) (*Affiliate  Link*)
 Bluetooth Profile : A2DP, ATT, AVRCP, GAVDP, GATT, HCRP, HFP, HID, HID over GATT, OPP, PAN, SPP
+
+### USB Audio Card
+At the moment I have not finished the audio output via Node JS lib. In the meantime I'm using a USB audio card - which is connected via audio cable to my PI to get audio to my PC - or simply the internal speaker of the R30 ;) .
 
 ## Software requirements
 
@@ -273,6 +277,7 @@ e.g: http://192.168.10.2:3000
 - [ ] Receive Log in sqlite database not working
 - [X] IC-R30 Bank name listing
 - [X] IC-R30 WX Mode not supported - i have no USA device
+- [X] Queue fills up when website is not in focus
 
 ### Workaround Audio with VLC
 
@@ -300,10 +305,10 @@ Restart=always
 WantedBy=multi-user.target
 
 pi@R30:~ $ sudo systemctl daemon-reload 
-pi@R30:~ $ sudo enable r30audio.service
+pi@R30:~ $ sudo systemctl enable r30audio.service
 pi@R30:~ $ sudo systemctl start r30audio.service
 
-# Add the web link to your /home/pi/Webinterface_ICOM_R30-main/config/default.json in server\audio\src and restart your service
+# Add the web link to your /home/pi/Webinterface_ICOM_R30-main/config/default.json in server\audio\src and restart your service and reload your website
 
 "server"  : {
     "audio" : {

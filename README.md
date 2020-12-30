@@ -31,11 +31,14 @@ OS : Raspbian GNU/Linux 10 (buster) / Windows 10
 ### Disable onboard Bluetooth
 
 ``` 
+sudo nano /boot/config.txt
+
 # Add line to /boot/config.txt
 dtoverlay=pi3-disable-bt
-```
 
-`sudo systemctl disable hciuart.service`
+# Disable hciuart
+sudo systemctl disable hciuart.service
+```
 
 ### Connect Bluetooth <-> IC-R30
 

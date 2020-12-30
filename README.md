@@ -17,27 +17,27 @@ OS : Raspbian GNU/Linux 10 (buster) / Windows 10
 ### Prepare Linux
 
 ```
-apt-get full-upgrade
-apt-get install pi-bluetooth
-apt-get install npm
-apt-get install nodejs
-apt-get install bluealsa
-apt-get install libasound2 libasound2-dev
+pi@R30:~ $ sudo apt-get full-upgrade
+pi@R30:~ $ sudo apt-get install pi-bluetooth
+pi@R30:~ $ sudo apt-get install npm
+pi@R30:~ $ sudo apt-get install nodejs
+pi@R30:~ $ sudo apt-get install bluealsa
+pi@R30:~ $ sudo apt-get install libasound2 libasound2-dev
 ``` 
 
 ### Disable onboard Bluetooth
 
 ``` 
-sudo nano /boot/config.txt
+pi@R30:~ $ sudo nano /boot/config.txt
 
 # Add line to /boot/config.txt
 dtoverlay=pi3-disable-bt
 
 # Disable hciuart
-sudo systemctl disable hciuart.service
+pi@R30:~ $ sudo systemctl disable hciuart.service
 
 # Reboot
-sudo reboot
+pi@R30:~ $ sudo reboot
 ```
 
 ### Connect Bluetooth <-> IC-R30

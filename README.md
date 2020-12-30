@@ -152,7 +152,7 @@ pi@R30:~ $ unzip main.zip
 pi@R30:~ $ cd Webinterface_ICOM_R30-main
 ```
 
-### Update
+### Update IC-R30 Webinterface * Optional
 ```	
 pi@R30:~ $ cp Webinterface_ICOM_R30-main/config/default.json ./default.json
 pi@R30:~ $ wget https://github.com/Spotterday/Webinterface_ICOM_R30/archive/main.zip

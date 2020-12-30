@@ -26,11 +26,60 @@ Browser : Version 87.0.4280.88
 
 ```
 pi@R30:~ $ sudo apt-get full-upgrade
+pi@R30:~ $ sudo apt-get install bluetooth bluez blueman
 pi@R30:~ $ sudo apt-get install pi-bluetooth
 pi@R30:~ $ sudo apt-get install npm
 pi@R30:~ $ sudo apt-get install nodejs
 pi@R30:~ $ sudo apt-get install bluealsa
 pi@R30:~ $ sudo apt-get install libasound2 libasound2-dev
+``` 
+
+```
+pi@R30:~ $ sudo cp -a /lib/systemd/system/bluetooth.service /etc/systemd/system
+
+pi@R30:~ $ sudo nano /etc/systemd/system/bluetooth.service
+
+[Unit]
+Description=Bluetooth service
+Documentation=man:bluetoothd(8)
+ConditionPathIsDirectory=/sys/class/bluetooth
+
+[Service]
+Type=dbus
+BusName=org.bluez
+ExecStart=/usr/lib/bluetooth/bluetoothd -C
+ExecStartPost=/usr/bin/sdptool add SP
+NotifyAccess=main
+#WatchdogSec=10
+#Restart=on-failure
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+LimitNPROC=1
+ProtectHome=true
+ProtectSystem=full
+
+[Install]
+WantedBy=bluetooth.target
+Alias=dbus-org.bluez.service
+```
+
+### Enable RFComm
+
+```
+pi@R30:~ $ sudo touch /etc/systemd/system/rfcomm.service
+
+pi@R30:~ $ sudo nano /etc/systemd/system/rfcomm.service
+
+[Unit]
+Description=RFCOMM service
+After=bluetooth.service
+Requires=bluetooth.service
+[Service]
+ExecStart=/usr/bin/rfcomm watch rfcomm0 1 /sbin/agetty -noclear rfcomm0 9600 vt100
+[Install]
+WantedBy=multi-user.target
+
+
+pi@R30:~ $ sudo systemctl enable rfcomm
 ``` 
 
 ### Disable onboard Bluetooth
@@ -50,7 +99,34 @@ pi@R30:~ $ sudo reboot
 
 ### Connect Bluetooth <-> IC-R30
 
-to be done ...
+Now the hard part, normally you could pair our R30 with linux via shell. But that want work by me or I'm acting weird :
+
+```	
+pi@R30:~ $  sudo bluetoothctl 
+
+[bluetooth]# agent on
+Agent registered
+
+[bluetooth]# pairable on
+Changing pairable on succeeded
+
+[bluetooth]# scan on
+Discovery started
+...
+...
+...
+
+[bluetooth]# scan off
+Discovery stopped
+
+[bluetooth]# pair XX:XX:XX:XX:XX:XX
+
+[bluetooth]# trust XX:XX:XX:XX:XX:XX
+Changing XX:XX:XX:XX:XX:XX trust succeeded
+[CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
+
+[bluetooth]# exit
+```	
 
 ### Download IC-R30 Webinterface project from Github
 
@@ -64,7 +140,14 @@ pi@R30:~ $ cd Webinterface_ICOM_R30-main
 
 ```	
 pi@R30:~/Webinterface_ICOM_R30-main $ npm install
+```
+
+#### Recompile node js sub projects with NPM - if necessary
+
 ```	
+pi@R30:~/Webinterface_ICOM_R30-main $ rm -rf node_modules/
+pi@R30:~/Webinterface_ICOM_R30-main $ npm install
+```
 
 ### Configure Webinterface
 
@@ -98,7 +181,7 @@ hwmac : In your R30 settings / menu : Bluetooth Set -> Bluetooth Device Informat
   },
   "scanner" : {
     "usa"   : false,
-    "hwmac" : "00:0B:E4:XX:XX:XX",
+    "hwmac" : "XX:XX:XX:XX:XX:XX",
     "serial": {
       "baudrate"  : 9600,
       "databits"  : 7,
@@ -174,7 +257,8 @@ e.g: http://192.168.10.2:3000
 
 - [ ] IC-R30 Settings not working
 - [ ] Receive audio via Bluetooth not working
-- [ ] Receive Log in sqlite database
+-- [x] Workaround with VLC
+- [ ] Receive Log in sqlite database not working
 
 
 

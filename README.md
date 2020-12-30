@@ -1,20 +1,20 @@
 # ICOM IC-R30 Webinterface
 
-![IC-R30 Webinterface](IC-R30 Webinterface.png)
+![IC-R30 Webinterface](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/IC-R30%20Webinterface.PNG)
 
 ## Hardware requirements
 
 Based on the following document [RS-R30-Brochure](doc/RS-R30-Brochure.pdf), you will need a USB dongle which supports SPP (CI-V command）.
-A possible USB dongel which works under Linux and Windows is this : [USB Dongle](https://amzn.to/3o0EV8l) *Affiliate  Link
+A possible USB dongel which works under Linux and Windows is this : [USB Dongle](https://amzn.to/3o0EV8l) *Affiliate  Link*
 -> Bluetooth Profile : A2DP, ATT, AVRCP, GAVDP, GATT, HCRP, HFP, HID, HID over GATT, OPP, PAN, SPP
 
 ## Software requirements
 
 OS : Raspbian GNU/Linux 10 (buster) / Windows 10
 
-### Installation
+## Installation
 
-#### Prepare Linux
+### Prepare Linux
 
 `apt-get full-upgrade`
 
@@ -28,7 +28,7 @@ OS : Raspbian GNU/Linux 10 (buster) / Windows 10
 
 `apt-get install libasound2 libasound2-dev`
 
-#### Disable onboard Bluetooth
+### Disable onboard Bluetooth
 
 ` # Add line to /boot/config.txt` 
 ` dtoverlay=pi3-disable-bt`

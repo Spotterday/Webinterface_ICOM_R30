@@ -302,6 +302,16 @@ WantedBy=multi-user.target
 pi@R30:~ $ sudo systemctl daemon-reload 
 pi@R30:~ $ sudo enable r30audio.service
 pi@R30:~ $ sudo systemctl start r30audio.service
+
+# Add the web link to your /home/pi/Webinterface_ICOM_R30-main/config/default.json in server\audio\src and restart your service
+
+"server"  : {
+    "audio" : {
+      "src" : "http:\\192.168.10.2\r30.mp3"
+    },
+    ...
+},
+
 ```
 
 

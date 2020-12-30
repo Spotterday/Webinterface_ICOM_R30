@@ -4,6 +4,7 @@
 
 ## Donate
 Guys I know a lot of stuff on Github is free. But I would appreciate a small coffee donation. The project has taken time and grey hairs.
+
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/spotterday/10)
 
 ## Hardware requirements

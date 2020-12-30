@@ -103,7 +103,7 @@ pi@R30:~ $ sudo reboot
 
 ### Connect Bluetooth <-> IC-R30
 
-Now the hard part, normally you could pair our R30 with linux via shell. But that want work by me or I'm acting weird :
+Now the hard part, normally you could pair your R30 with linux via shell. But that dosn´t want work on my PI or I'm acting weird :
 
 Important your R30 should be in mode << Pairing Reception >>
 
@@ -134,7 +134,7 @@ Changing XX:XX:XX:XX:XX:XX trust succeeded
 [bluetooth]# exit
 ```	
 
-Faillback is to do it via Desktop ;) 
+Fallback is - you can do it via Desktop ;) 
 
 ![Linux 1](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/doc/img/linux1.png)
 ![Linux 2](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/doc/img/linux2.png)
@@ -267,9 +267,14 @@ e.g: http://192.168.10.2:3000
 ## Known Issues
 
 - [ ] IC-R30 Settings not working
+- [ ] IC-R30 Bank frequencies listing not working
 - [ ] Receive audio via Bluetooth not working
--- [x] Workaround with VLC
+- [x] Receive audio via Bluetooth - Workaround with VLC - documented
 - [ ] Receive Log in sqlite database not working
+- [X] IC-R30 Bank name listing
+- [X] IC-R30 WX Mode not supported - i have no USA device
+
+### Workaround Audio with VLC
 
 
 

@@ -269,7 +269,7 @@ e.g: http://192.168.10.2:3000
 - [ ] IC-R30 Settings not working
 - [ ] IC-R30 Bank frequencies listing not working
 - [ ] Receive audio via Bluetooth not working
-- [x] Receive audio via Bluetooth - Workaround with VLC - documented
+- [x] [Receive audio via Bluetooth - Workaround with VLC](https://github.com/Spotterday/Webinterface_ICOM_R30#workaround-audio-with-vlc)
 - [ ] Receive Log in sqlite database not working
 - [X] IC-R30 Bank name listing
 - [X] IC-R30 WX Mode not supported - i have no USA device

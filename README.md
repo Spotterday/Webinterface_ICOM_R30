@@ -1,4 +1,6 @@
-# ICOM IC-R30 Webinterface
+# ICOM IC-R30 Webinterface [Linux]
+
+for Windows : [README_WIN.md](README_WIN.md)
 
 ![IC-R30 Webinterface](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/IC-R30%20Webinterface.PNG)
 
@@ -48,7 +50,7 @@ pi@R30:~ $ sudo reboot
 
 ### Connect Bluetooth <-> IC-R30
 
-
+to be done ...
 
 ### Download IC-R30 Webinterface project from Github
 
@@ -172,7 +174,7 @@ e.g: http://192.168.10.2:3000
 
 - [ ] IC-R30 Settings not working
 - [ ] Receive audio via Bluetooth not working
-
+- [ ] Receive Log in sqlite database
 
 
 

@@ -1,0 +1,48 @@
+{
+  "name": "IC-R30",
+  "version": "1.0.0",
+  "description": "Remote Control for ICOM IC-R30",
+  "homepage": "https://www.spotterday.de",
+  "main": "client.js",
+  "os": [
+    "win32",
+    "linux"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": "./client.js",
+  "keywords": [],
+  "author": "Christian Pusch [https://www.spotterday.de]",
+  "license": "ISC",
+  "engineStrict": true,
+  "engines": {
+    "npm": ">=6.0.0",
+    "node": ">=14"
+  },
+  "pkg": {
+    "scripts": "client.js"
+  },
+  "dependencies": {
+    "bluetooth-classic-serialport-client": "latest",
+    "buffer": "latest",
+    "express": "latest",
+    "http": "latest",
+    "fs": "latest",
+    "sqlite3": "latest",
+    "mysql2": "latest",
+    "os": "latest",
+    "config": "latest",
+    "audio-speaker": "latest",
+    "response.js": "^0.10.1",
+    "serialport": "latest",
+    "node-bluetooth-serial-port": "tinyprinter/node-bluetooth-serial-port#master",
+    "socket.io": "latest",
+    "chalk": "latest",
+    "jquery-mousewheel": "latest",
+    "alsa-capture": "latest"
+  },
+  "optionalDependencies": {
+
+  }
+}

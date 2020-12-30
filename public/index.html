@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>IC-30 Remote Console</title>
+
+    <!-- Global stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+    <link href="../../../../global_assets/css/icons/icomoon/styles.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/bootstrap_limitless.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/layout.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/colors.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/own.css" rel="stylesheet" type="text/css">
+    <!-- /global stylesheets -->
+
+    <!-- Core JS files -->
+    <script src="../../../../global_assets/js/main/jquery.min.js"></script>
+    <script src="../../../../global_assets/js/main/bootstrap.bundle.min.js"></script>
+
+    <script src="../../../../global_assets/js/plugins/easyNotify/easyNotify.js"></script>
+    <script src="../../../../global_assets/js/plugins/notifications/pnotify.min.js"></script>
+    <script src="../../../../global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+    <script src="../../../../global_assets/js/plugins/loaders/blockui.min.js"></script>
+    <script src="../../../../global_assets/js/plugins/sliders/ion_rangeslider.min.js"></script>
+    <script src="../../../../global_assets/js/plugins/sliders/nouislider.min.js"></script>
+    <script src="../../../../global_assets/js/plugins/forms/selects/select2.min.js"></script>
+    <script src="../../../../global_assets/js/jquery.md5.js"></script>
+    <script src="../../../../global_assets/js/jquery.mouse.js"></script>
+    <!-- /core JS files -->
+
+</head>
+
+<body class="navbar-top layout-boxed-bg">
+
+<!-- Boxed layout wrapper -->
+<div class="d-flex flex-column flex-1 layout-boxed">
+
+    <!-- Main navbar -->
+    <div class="navbar navbar-expand-md navbar-light fixed-top">
+        <div class="d-md-none">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-mobile">
+                <i class="icon-tree5"></i>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-mobile">
+            <ul class="navbar-nav">
+                <li class="nav-item mega-menu-full">
+                    <a href="#" class="navbar-nav-link"> IC-R30 Remote Console </a>
+                </li>
+            </ul>
+
+            <div class="float-right">
+                <span class="badge my-3 my-md-0 ml-md-3 mr-md-auto font-size-sm">Bluetooth :</span> <span id="R_SERIAL_STATUS" class="badge my-3 my-md-0 ml-md-3 mr-md-auto">Online</span>
+                <span class="badge my-3 my-md-0 ml-md-3 font-size-sm">Socket :</span> <span id="R_SOCKET_STATUS" class="badge my-3 my-md-0 ml-md-3 mr-md-auto">Online</span>
+                <span class="badge my-3 my-md-0 ml-md-3 font-size-sm">Version [WEB] :</span> <span id="R_VERSION_WEB" class="badge badge-warning my-3 my-md-0 ml-md-3 mr-md-auto"></span>
+                <span class="badge my-3 my-md-0 ml-md-3 font-size-sm">Version [SERVER] :</span> <span id="R_VERSION_SERVER" class="badge badge-warning my-3 my-md-0 ml-md-3 mr-md-auto"></span>
+                <span class="badge my-3 my-md-0 ml-md-3 font-size-sm">Queue :</span> <span id="R_QUEUE" class="badge badge-success my-3 my-md-0 ml-md-3 mr-md-auto"></span>
+            </div>
+        </div>
+    </div>
+    <!-- /main navbar -->
+
+
+    <!-- Page content -->
+    <div class="page-content">
+
+        <!-- Main content -->
+        <div class="content-wrapper">
+
+            <!-- Page header -->
+            <div class="page-header border-bottom-0">
+                <div class="page-header-content header-elements-md-inline">
+                    <div class="page-title d-flex">
+                        <h4><span class="font-weight-semibold">IC-R30</span> - Dashboard</h4>
+                        <a href="#" class="header-elements-toggle text-default d-md-none"><i class="icon-more"></i></a>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /page header -->
+
+            <!-- Content area -->
+            <div class="content pt-0">
+                <!-- Dashboard content -->
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="row" id="R_BAND_A">
+                            <div class="col-xl-12">
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <div class="card mb-0" style="">
+                                            <div class="input-group">
+                                                <span id="R_BAND_A_ACTIVE" class="input-group-prepend bg-green-300">
+                                                    <span class="input-group-text text-black font-weight-bold" style="font-size: 21px;">A</span>
+                                                </span>
+
+                                                <input type="text" id="R_A_FREQ_1" name="R_A_FREQ_1" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
+
+                                                <input type="text" id="R_A_FREQ_2" name="R_A_FREQ_2" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_A_FREQ_3" name="R_A_FREQ_3" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_A_FREQ_4" name="R_A_FREQ_4" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
+
+                                                <input type="text" id="R_A_FREQ_5" name="R_A_FREQ_5" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_A_FREQ_6" name="R_A_FREQ_6" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_A_FREQ_7" name="R_A_FREQ_7" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
+
+                                                <input type="text" id="R_A_FREQ_8" name="R_A_FREQ_8" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_A_FREQ_9" name="R_A_FREQ_9" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_A_FREQ_10" name="R_A_FREQ_10" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <span class="input-group-append align-content-center">
+                                                    <select id="R_A_FREQ_MODE" style="font-size: 21px !important;" class="form-control select-search">
+                                                        <option value="1">LSB</option>
+                                                        <option value="2">USB</option>
+                                                        <option value="3">AM</option>
+                                                        <option value="4">AM</option>
+                                                        <option value="5">AM-N</option>
+                                                        <option value="6">CW</option>
+                                                        <option value="7">FM</option>
+                                                        <option value="8">FM</option>
+                                                        <option value="9">FM-N</option>
+                                                        <option value="10">WFM</option>
+                                                        <option value="11">CW-R</option>
+                                                        <option value="12">P25</option>
+                                                        <option value="13">D-STAR</option>
+                                                        <option value="14">dPMR</option>
+                                                        <option value="15">NXDN-VN</option>
+                                                        <option value="16">NXDN-N</option>
+                                                        <option value="17">DCR</option>
+                                                    </select>
+                                                </span>
+
+                                                <span class="input-group-append align-content-center bg-pink-600 flex-fill">
+                                                    <span id="R_A_FREQ_NAME" class="input-group-text align-content-center text-black font-weight-bold flex-fill" style="font-size: 21px;"></span>
+                                                </span>
+
+                                                <span class="input-group-append align-content-center">
+                                                    <select id="R_A_TUNING_STEP" style="font-size: 21px;" class="form-control select-search">
+                                                        <option value="0">0.01 kHz</option>
+                                                        <option value="1">0.1 kHz</option>
+                                                        <option value="2">1 kHz</option>
+                                                        <option value="3">3.125 kHz</option>
+                                                        <option value="4">5 kHz</option>
+                                                        <option value="5">6.25 kHz</option>
+                                                        <option value="6">8.33 kHz</option>
+                                                        <option value="7">9 kHz</option>
+                                                        <option value="8">10 kHz</option>
+                                                        <option value="9">12.5 kHz</option>
+                                                        <option value="10">15 kHz</option>
+                                                        <option value="11">20 kHz</option>
+                                                        <option value="12">25 kHz</option>
+                                                        <option value="13">30 kHz</option>
+                                                        <option value="14">50 kHz</option>
+                                                        <option value="15">100 kHz</option>
+                                                        <option value="16">125 kHz</option>
+                                                        <option value="17">200 kHz</option>
+                                                    </select>
+                                                </span>
+                                            </div>
+
+                                            <div class="progress">
+                                                <span class="input-group-append align-content-center bg-blue-300">
+                                                    <span class="input-group-text align-content-center text-black pl-1 pr-1" >&nbsp;S-METER&nbsp;&nbsp;</span>
+                                                </span>
+                                                <div class="progress-bar bg-success" id="R_A_S_METER"></div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row float-right">
+                                    <div class="col-xl-12">
+                                        <span id="R_A_MEMORY_GROUP_NAME" class="badge rounded-0 badge-warning text-black" title="Current Memory Bank"></span>
+                                        |
+                                        <span id="R_A_SCAN" class="badge rounded-0 badge-info text-black" title="Scan in progress">SCAN</span>
+                                        |
+                                        <span id="R_A_S_METER_SQUELCH_STATUS" class="badge rounded-0 badge-info text-black">SQL</span>
+                                        |
+                                        <span id="R_A_FREQ_ANL" class="badge rounded-0 badge-info text-black" title="Automatic Noise Limiter">ANL</span>
+                                        |
+                                        <span id="R_A_NB" class="badge rounded-0 badge-info text-black" title="Noise Blanker">NB</span>
+                                        |
+                                        <span id="R_A_AFC" class="badge rounded-0 badge-info text-black" title="Automatic Frequency Control">AFC</span>
+                                        |
+                                        <span id="R_A_VSC" class="badge rounded-0 badge-info text-black" title="Voice Squelch Control">VSC</span>
+                                        |
+                                        <span id="R_A_SKIP_OFF" class="badge rounded-0 badge-info text-black" title="Frequency skip off">Off</span>
+                                        <span id="R_A_SKIP_SKIP" class="badge rounded-0 badge-info text-black" title="Frequency skip temporary">Skip</span>
+                                        <span id="R_A_SKIP_PSKIP" class="badge rounded-0 badge-info text-black" title="Frequency skip permanently">PSkip</span>
+                                        |
+                                        <span id="R_A_OPERATION_MODE_VFO" class="badge rounded-0 badge-info text-black">VFO</span>
+                                        <span id="R_A_OPERATION_MODE_MEM" class="badge rounded-0 badge-info text-black">MEM</span>
+                                        <span id="R_A_OPERATION_MODE_WX" class="badge rounded-0 badge-info text-black">WX</span>
+                                        |
+                                        <span id="R_A_REC" class="badge rounded-0 badge-info text-black">REC</span>
+                                        |
+                                        <span id="R_A_DUP_OFF" class="badge rounded-0 badge-info text-black">OFF</span>
+                                        <span id="R_A_DUP_MIN" class="badge rounded-0 badge-info text-black">DUP -</span>
+                                        <span id="R_A_DUP_PLU" class="badge rounded-0 badge-info text-black">DUP +</span>
+                                        |
+                                        <span id="R_A_ATT_OFF" class="badge rounded-0 badge-info text-black">OFF</span>
+                                        <span id="R_A_ATT_ATT1" class="badge rounded-0 badge-info text-black">ATT1</span>
+                                        <span id="R_A_ATT_ATT2" class="badge rounded-0 badge-info text-black">ATT2</span>
+                                        <span id="R_A_ATT_ATT3" class="badge rounded-0 badge-info text-black">ATT3</span>
+                                        <div class="card">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="R_BAND_B">
+                            <div class="col-xl-12">
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <div class="card  mb-0" >
+                                            <div class="input-group">
+                                                <span id="R_BAND_B_ACTIVE" class="input-group-prepend bg-light">
+                                                    <span class="input-group-text text-black font-weight-bold" style="font-size: 21px;">B</span>
+                                                </span>
+
+                                                <input type="text" id="R_B_FREQ_1" name="R_B_FREQ_1" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
+
+                                                <input type="text" id="R_B_FREQ_2" name="R_B_FREQ_2" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_B_FREQ_3" name="R_B_FREQ_3" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_B_FREQ_4" name="R_B_FREQ_4" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
+
+                                                <input type="text" id="R_B_FREQ_5" name="R_B_FREQ_5" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_B_FREQ_6" name="R_B_FREQ_6" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_B_FREQ_7" name="R_B_FREQ_7" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
+
+                                                <input type="text" id="R_B_FREQ_8" name="R_B_FREQ_8" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_B_FREQ_9" name="R_B_FREQ_9" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <input type="text" id="R_B_FREQ_10" name="R_B_FREQ_10" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+
+                                                <span class="input-group-append align-content-center">
+                                                    <select id="R_B_FREQ_MODE" style="font-size: 21px;" class="form-control select-search">
+                                                        <option value="1">LSB</option>
+                                                        <option value="2">USB</option>
+                                                        <option value="3">AM</option>
+                                                        <option value="4">AM</option>
+                                                        <option value="5">AM-N</option>
+                                                        <option value="6">CW</option>
+                                                        <option value="7">FM</option>
+                                                        <option value="8">FM</option>
+                                                        <option value="9">FM-N</option>
+                                                        <option value="10">WFM</option>
+                                                        <option value="11">CW-R</option>
+                                                        <option value="12">P25</option>
+                                                        <option value="13">D-STAR</option>
+                                                        <option value="14">dPMR</option>
+                                                        <option value="15">NXDN-VN</option>
+                                                        <option value="16">NXDN-N</option>
+                                                        <option value="17">DCR</option>
+                                                    </select>
+                                                </span>
+
+                                                <span class="input-group-append align-content-center bg-pink-600 flex-fill">
+                                                    <span id="R_B_FREQ_NAME" class="input-group-text align-content-center text-black font-weight-bold flex-fill" style="font-size: 21px;"></span>
+                                                </span>
+
+                                                <span class="input-group-append align-content-center">
+                                                    <select id="R_B_TUNING_STEP" style="font-size: 21px;" class="form-control select-search">
+                                                        <option value="0">0.01 kHz</option>
+                                                        <option value="1">0.1 kHz</option>
+                                                        <option value="2">1 kHz</option>
+                                                        <option value="3">3.125 kHz</option>
+                                                        <option value="4">5 kHz</option>
+                                                        <option value="5">6.25 kHz</option>
+                                                        <option value="6">8.33 kHz</option>
+                                                        <option value="7">9 kHz</option>
+                                                        <option value="8">10 kHz</option>
+                                                        <option value="9">12.5 kHz</option>
+                                                        <option value="10">15 kHz</option>
+                                                        <option value="11">20 kHz</option>
+                                                        <option value="12">25 kHz</option>
+                                                        <option value="13">30 kHz</option>
+                                                        <option value="14">50 kHz</option>
+                                                        <option value="15">100 kHz</option>
+                                                        <option value="16">125 kHz</option>
+                                                        <option value="17">200 kHz</option>
+                                                    </select>
+                                                </span>
+                                            </div>
+
+                                            <div class="progress">
+                                                <span class="input-group-append align-content-center bg-blue-300">
+                                                    <span class="input-group-text align-content-center text-black pl-1 pr-1" >&nbsp;S-METER&nbsp;&nbsp;</span>
+                                                </span>
+                                                <div class="progress-bar bg-teal" id="R_B_S_METER"></div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row float-right">
+                                    <div class="col-xl-12 ">
+                                        <span id="R_B_MEMORY_GROUP_NAME" class="badge rounded-0 badge-warning text-black"></span>
+                                        |
+                                        <span id="R_B_SCAN" class="badge rounded-0 badge-info text-black">SCAN</span>
+                                        |
+                                        <span id="R_B_S_METER_SQUELCH_STATUS" class="badge rounded-0 badge-info text-black">SQL</span>
+                                        |
+                                        <span id="R_B_FREQ_ANL" class="badge rounded-0 badge-info text-black">ANL</span>
+                                        |
+                                        <span id="R_B_NB" class="badge rounded-0 badge-info text-black">NB</span>
+                                        |
+                                        <span id="R_B_AFC" class="badge rounded-0 badge-info text-black">AFC</span>
+                                        |
+                                        <span id="R_B_VSC" class="badge rounded-0 badge-info text-black" title="Voice Squelch Control">VSC</span>
+                                        |
+                                        <span id="R_B_SKIP_OFF" class="badge rounded-0 badge-info text-black" title="Off">Off</span>
+                                        <span id="R_B_SKIP_SKIP" class="badge rounded-0 badge-info text-black" title="Skip">Skip</span>
+                                        <span id="R_B_SKIP_PSKIP" class="badge rounded-0 badge-info text-black" title="PSkip">PSkip</span>
+                                        |
+                                        <span id="R_B_OPERATION_MODE_VFO" class="badge rounded-0 badge-info text-black">VFO</span>
+                                        <span id="R_B_OPERATION_MODE_MEM" class="badge rounded-0 badge-info text-black">MEM</span>
+                                        <span id="R_B_OPERATION_MODE_WX" class="badge rounded-0 badge-info text-black">WX</span>
+                                        |
+                                        <span id="R_B_REC" class="badge rounded-0 badge-info text-black">REC</span>
+                                        |
+                                        <span id="R_B_DUP_OFF" class="badge rounded-0 badge-info text-black">OFF</span>
+                                        <span id="R_B_DUP_MIN" class="badge rounded-0 badge-info text-black">DUP -</span>
+                                        <span id="R_B_DUP_PLU" class="badge rounded-0 badge-info text-black">DUP +</span>
+                                        |
+                                        <span id="R_B_ATT_OFF" class="badge rounded-0 badge-info text-black">OFF</span>
+                                        <span id="R_B_ATT_ATT1" class="badge rounded-0 badge-info text-black">ATT1</span>
+                                        <span id="R_B_ATT_ATT2" class="badge rounded-0 badge-info text-black">ATT2</span>
+                                        <span id="R_B_ATT_ATT3" class="badge rounded-0 badge-info text-black">ATT3</span>
+                                        <div class="card">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-6">
+                                <div class="card">
+                                    <div class="card-header bg-light border-bottom header-elements-sm-inline pt-1 pb-1">Actions</div>
+
+                                    <div class="btn-group ">
+                                        <button id="R_BTN_REQ_UP" class="btn bg-grey-300"><i class="icon-arrow-up7 "></i></button>
+                                        <button id="R_BTN_REQ_DOWN" class="btn bg-grey-300"><i class="icon-arrow-down8"></i></button>
+                                    </div>
+                                    <div class="btn-group pt-1">
+                                        <button id="R_BTN_REQ_SET" class="btn btn-primary">SET</button>
+                                        <button id="R_BTN_REQ_SINGLE_DUAL" class="btn btn-primary">SINGL / DUAL</button>
+                                        <button id="R_BTN_REQ_SWITCH_BAND" class="btn btn-primary">Switch Band</button>
+                                        <button id="R_BTN_REQ_SCAN" class="btn btn-primary">SCAN</button>
+                                        <button id="R_BTN_REQ_REC" class="btn btn-primary">REC</button>
+                                        <button id="R_BTN_REQ_VFO_MR_MX" class="btn btn-primary">VFO/MEM/MX</button>
+
+                                    </div>
+                                    <!--
+                                    <div class="btn-group pt-1">
+
+                                    </div>
+                                    -->
+                                    <div class="btn-group pt-1">
+                                        <button id="R_BTN_REQ_ATT" class="btn btn-primary">ATT</button>
+                                        <button id="R_BTN_REQ_NB" class="btn btn-primary">NB</button>
+                                        <button id="R_BTN_REQ_SKIP" class="btn btn-primary">SKIP</button>
+                                        <button id="R_BTN_REQ_ANL" class="btn btn-primary">ANL</button>
+                                        <button id="R_BTN_REQ_DUP" class="btn btn-primary">DUP</button>
+                                        <button id="R_BTN_REQ_AFC" class="btn btn-primary" title="Automatic Frequency Control">AFC</button>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <select id="R_SCAN_SELECT" style="font-size: 21px;" class="form-control select-search">
+                                        <optgroup label="Default Search Modes">
+                                            <option value="AL">ALL</option>
+                                            <option value="MO">MODE</option>
+                                            <option value="BA">BAND</option>
+                                            <option value="NS">Near Station</option>
+                                            <option value="AW">Auto MW</option>
+                                            <option value="TO">TONE</option>
+                                            <option value="GL">Group Link</option>
+                                        </optgroup>
+
+                                        <optgroup label="Memory Group" id="R_MEMORY_BANK">
+
+                                        </optgroup>
+
+                                        <optgroup label="P-Link" id="R_MEMORY_BANK_P_LINK">
+
+                                        </optgroup>
+                                            
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card">
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td><input type="text" class="form-control ion-pips-height-helper" id="R_AF_GAIN"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><input type="text" class="form-control ion-pips-height-helper" id="R_RF_GAIN"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><input type="text" class="form-control ion-pips-height-helper" id="R_SQUELCH_LEVEL"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-xl-12">
+
+                        <!-- My messages -->
+                        <div class="card">
+
+                            <!-- Tabs -->
+                            <ul class="nav nav-tabs nav-tabs-bottom nav-justified mb-0">
+                                <li class="nav-item">
+                                    <a href="#log" class="nav-link font-size-sm text-uppercase active" data-toggle="tab">
+                                        Receive Log
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#memory" class="nav-link font-size-sm text-uppercase " data-toggle="tab">
+                                        Memory
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#settings" class="nav-link font-size-sm text-uppercase " data-toggle="tab">
+                                        Settings
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#debug" class="nav-link font-size-sm text-uppercase " data-toggle="tab">
+                                        Debug
+                                    </a>
+                                </li>
+                            </ul>
+                            <!-- /tabs -->
+                            <!-- Tabs content -->
+                            <div class="tab-content card-body p-0">
+                                <div class="tab-pane active fade show" id="log">
+                                    <div class="card">
+                                        <table class="table datatable-basic table-striped" id="R_TABLE_RECIEVE_LOG">
+                                            <thead>
+                                                <tr>
+                                                    <th>Frequency</th>
+                                                    <th>Name</th>
+                                                    <th>Timestamp</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="R_LOG">
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="memory">
+                                    <div class="card">
+                                        <div class="card-body p-0">
+                                            <div class="d-md-flex">
+                                                <ul class="nav nav-tabs nav-tabs-vertical flex-column wmin-md-200 mb-md-0 border-bottom-0">
+                                                    <li class="nav-item"><a href="#vertical-left-tab1" class="nav-link active" data-toggle="tab"><i class="icon-menu7 mr-2"></i> Active</a></li>
+                                                    <li class="nav-item"><a href="#vertical-left-tab2" class="nav-link" data-toggle="tab"><i class="icon-menu7 mr-2"></i> Inactive</a></li>
+                                                </ul>
+
+                                                <div class="tab-content w-100">
+                                                    <div class="tab-pane fade show active" id="vertical-left-tab1">
+                                                        <div class="table-responsive">
+                                                            <table class="table text-nowrap">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Campaign</th>
+                                                                        <th>Client</th>
+                                                                        <th>Changes</th>
+                                                                        <th>Budget</th>
+                                                                        <th>Status</th>
+                                                                        <th class="text-center" style="width: 20px;"><i class="icon-arrow-down12"></i></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr class="table-active table-border-double">
+                                                                        <td colspan="5">Today</td>
+                                                                        <td class="text-right">
+                                                                            <span class="progress-meter" id="today-progress" data-progress="30"></span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="tab-pane fade" id="vertical-left-tab2">
+                                                        TEST
+                                                    </div>
+
+                                                    <div class="tab-pane fade" id="vertical-left-tab3">
+                                                        TEST
+                                                    </div>
+
+                                                    <div class="tab-pane fade" id="vertical-left-tab4">
+                                                        TEST
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="settings">
+
+                                </div>
+
+                                <div class="tab-pane fade " id="debug">
+                                    <ul class="media-list" id="R_DEBUG">
+
+                                    </ul>
+                                </div>
+
+
+                            </div>
+                            <!-- /tabs content -->
+
+                        </div>
+                        <!-- /my messages -->
+
+                    </div>
+
+                </div>
+                <!-- /dashboard content -->
+
+            </div>
+            <!-- /content area -->
+
+            <audio></audio>
+
+
+            <!-- Footer -->
+            <div class="navbar navbar-expand-lg navbar-light">
+                <div class="text-center d-lg-none w-100">
+                    <button type="button" class="navbar-toggler dropdown-toggle" data-toggle="collapse" data-target="#navbar-footer">
+                        <i class="icon-unfold mr-2"></i>
+                        Footer
+                    </button>
+                </div>
+
+                <div class="navbar-collapse collapse" id="navbar-footer">
+						<span class="navbar-text">
+							&copy; 2020 - 2021. <a href="#">IC-R30</a> by <a href="#" target="_blank">Spotterday</a>
+						</span>
+                </div>
+            </div>
+            <!-- /footer -->
+
+        </div>
+        <!-- /main content -->
+
+    </div>
+    <!-- /page content -->
+
+</div>
+<!-- /boxed layout wrapper -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="web.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "version" : {
+    "web" : "1.4.0",
+    "server" : "1.4.5"
+  },
+  "server"  : {
+    "audio" : {
+      "src" : "http://{PI-IP}:8888/air.mp3"
+    },
+    "http": {
+      "host": "0.0.0.0",
+      "port": 3000
+    },
+    "devices": {
+      "win"   : "Com4",
+      "linux" : "/dev/rfcomm0"
+    }
+  },
+  "scanner" : {
+    "usa"   : false,
+    "hwmac" : "XX:XX:XX:XX:XX:XX",
+    "serial": {
+      "baudrate"  : 9600,
+      "databits"  : 7,
+      "autoopen"  : true,
+      "stopbits"  : 1,
+      "parity"    : "none",
+      "lock"      : true
+    }
+  },
+  "debug"   : {
+    "server"  : false,
+    "web"     : false,
+    "data"    : false
+  },
+  "remote"  : {
+    "connect"   : false,
+    "host"      : "",
+    "port"      : 6000,
+    "username"  : "",
+    "key"       : "",
+    "rights"    : {
+      "change" : {
+        "freq"  : false,
+        "mode"  : false
+      }
+    }
+  }
+}

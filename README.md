@@ -69,6 +69,10 @@ pi@R30:~/Webinterface_ICOM_R30-main $ cd config
 pi@R30:~/Webinterface_ICOM_R30-main/config $ nano default.json
 ```	
 
+The main part is the device and scanner section
+
+hwmac : In your R30 settings : Bluetooth Set -> Bluetooth Device Information -> BD Address
+
 ```
 {
   "version" : {

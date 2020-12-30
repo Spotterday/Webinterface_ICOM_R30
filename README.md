@@ -5,8 +5,8 @@
 ## Hardware requirements
 
 Based on the following document [RS-R30-Brochure](doc/RS-R30-Brochure.pdf), you will need a USB dongle which supports SPP (CI-V command）.
-A possible USB dongel which works under Linux and Windows is this : [USB Dongle](https://amzn.to/3o0EV8l) *Affiliate  Link*
--> Bluetooth Profile : A2DP, ATT, AVRCP, GAVDP, GATT, HCRP, HFP, HID, HID over GATT, OPP, PAN, SPP
+A possible USB dongel which works under Linux and Windows is this : [USB Dongle](https://amzn.to/3o0EV8l) (*Affiliate  Link*)
+Bluetooth Profile : A2DP, ATT, AVRCP, GAVDP, GATT, HCRP, HFP, HID, HID over GATT, OPP, PAN, SPP
 
 ## Software requirements
 
@@ -37,7 +37,20 @@ dtoverlay=pi3-disable-bt
 
 `sudo systemctl disable hciuart.service`
 
+### Connect Bluetooth <-> IC-R30
 
+
+### Download and compile node js sub projects for IC-R30 Webinterface
+
+```	
+pi@R30:~ $ wget https://github.com/Spotterday/Webinterface_ICOM_R30/archive/main.zip
+pi@R30:~ $ unzip main.zip
+pi@R30:~ $ cd Webinterface_ICOM_R30-main
+```
+
+```	
+pi@R30:~/Webinterface_ICOM_R30-main $ npm install
+```	
 
 
 ## Known Issues

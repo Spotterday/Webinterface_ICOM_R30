@@ -16,6 +16,7 @@ Bluetooth Profile : A2DP, ATT, AVRCP, GAVDP, GATT, HCRP, HFP, HID, HID over GATT
 ## Software requirements
 
 OS : Raspbian GNU/Linux 10 (buster) / Windows 10
+Browser : Version 87.0.4280.88 
 
 ## Installation
 
@@ -48,6 +49,7 @@ pi@R30:~ $ sudo reboot
 ### Connect Bluetooth <-> IC-R30
 
 
+
 ### Download IC-R30 Webinterface project from Github
 
 ```	
@@ -69,9 +71,9 @@ pi@R30:~/Webinterface_ICOM_R30-main $ cd config
 pi@R30:~/Webinterface_ICOM_R30-main/config $ nano default.json
 ```	
 
-The main part is the device and scanner section
+The main part is the **device** and **scanner** section
 
-hwmac : In your R30 settings : Bluetooth Set -> Bluetooth Device Information -> BD Address
+hwmac : In your R30 settings / menu : Bluetooth Set -> Bluetooth Device Information -> BD Address
 
 ```
 {
@@ -132,13 +134,14 @@ pi@R30:~/Webinterface_ICOM_R30-main $ node client.js
 
 ### Run Webinterface as Service
 
-
+### Open Webinterface
+http://{YOUR_PI_IP_ADDRESS}:{PORT_OF_DEFAULT_JSON}
+e.g: http://192.168.10.2:3000
 
 ## Known Issues
 
-### IC-R30 Settings not working
-
-### Receive audio via Bluetooth not working
+- [ ] IC-R30 Settings not working
+- [ ] Receive audio via Bluetooth not working
 
 
 

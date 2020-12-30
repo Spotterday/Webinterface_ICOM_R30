@@ -152,6 +152,15 @@ pi@R30:~ $ unzip main.zip
 pi@R30:~ $ cd Webinterface_ICOM_R30-main
 ```
 
+### Update
+```	
+pi@R30:~ $ cp Webinterface_ICOM_R30-main/config/default.json ./default.json
+pi@R30:~ $ wget https://github.com/Spotterday/Webinterface_ICOM_R30/archive/main.zip
+pi@R30:~ $ unzip main.zip
+pi@R30:~ $ cp default.json Webinterface_ICOM_R30-main/config/
+pi@R30:~ $ rm -f default.json
+```	
+
 ### Compile node js sub projects with NPM 
 
 A list of packages can be find in [package.json](package.json) under section **dependencies**.

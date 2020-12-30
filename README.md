@@ -6,7 +6,8 @@ for Windows : [README_WIN.md](README_WIN.md)
 
 ## Contact and Support
 
-I try my best to support you - for contact use r30@spotterday.de - but no 24 hour support
+I try my best to support you - for contact use r30@spotterday.de - but no 24 hour support.
+Otherwise check the [FAQ.md](FAQ.md) and [HOWTO.md](HOWTO.md), for questions already asked.
 
 ## Donate
 Guys I know a lot of stuff on Github is free. But I would appreciate a small coffee donation. The project has taken time and grey hairs.

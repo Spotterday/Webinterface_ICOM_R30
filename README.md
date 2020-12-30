@@ -134,6 +134,36 @@ pi@R30:~/Webinterface_ICOM_R30-main $ node client.js
 
 ### Run Webinterface as Service
 
+#### Create systemd file 
+```
+pi@R30:~ $ sudo touch /lib/systemd/system/r30.service
+```
+
+#### Add systemd information
+```
+pi@R30:~ $ sudo nano /lib/systemd/system/r30.service
+```
+```
+[Unit]
+Description=R30
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/nodejs /home/pi/Webinterface_ICOM_R30-main/client.js
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+```
+#### Reload systemd & enable R30 service & start 
+
+```
+pi@R30:~ $ sudo systemctl daemon-reload 
+pi@R30:~ $ sudo systemctl enable r30.service
+pi@R30:~ $ sudo systemctl start r30.service
+```
+
 ### Open Webinterface
 http://{YOUR_PI_IP_ADDRESS}:{PORT_OF_DEFAULT_JSON}
 e.g: http://192.168.10.2:3000

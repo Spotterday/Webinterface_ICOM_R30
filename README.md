@@ -101,6 +101,8 @@ pi@R30:~ $ sudo reboot
 
 Now the hard part, normally you could pair our R30 with linux via shell. But that want work by me or I'm acting weird :
 
+Important your R30 should be in mode << Pairing Reception >>
+
 ```	
 pi@R30:~ $  sudo bluetoothctl 
 
@@ -127,6 +129,11 @@ Changing XX:XX:XX:XX:XX:XX trust succeeded
 
 [bluetooth]# exit
 ```	
+
+Faillback is to do it via Desktop ;) 
+
+![Linux 1](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/doc/img/linux1.PNG)
+![Linux 2](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/doc/img/linux2.PNG)
 
 ### Download IC-R30 Webinterface project from Github
 

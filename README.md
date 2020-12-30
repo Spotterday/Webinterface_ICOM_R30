@@ -40,7 +40,7 @@ dtoverlay=pi3-disable-bt
 ### Connect Bluetooth <-> IC-R30
 
 
-### Download and compile node js sub projects for IC-R30 Webinterface
+### Download IC-R30 Webinterface project from Github
 
 ```	
 pi@R30:~ $ wget https://github.com/Spotterday/Webinterface_ICOM_R30/archive/main.zip
@@ -48,10 +48,70 @@ pi@R30:~ $ unzip main.zip
 pi@R30:~ $ cd Webinterface_ICOM_R30-main
 ```
 
+### Compile node js sub projects with NPM 
+
 ```	
 pi@R30:~/Webinterface_ICOM_R30-main $ npm install
 ```	
 
+### Configure Webinterface
+
+```	
+pi@R30:~/Webinterface_ICOM_R30-main $ cd config
+pi@R30:~/Webinterface_ICOM_R30-main/config $ nano default.json
+```	
+
+```
+{
+  "version" : {
+    "web" : "1.4.0",
+    "server" : "1.4.5"
+  },
+  "server"  : {
+    "audio" : {
+      "src" : ""
+    },
+    "http": {
+      "host": "0.0.0.0",
+      "port": 3000
+    },
+    "devices": {
+      "win"   : "Com4",
+      "linux" : "/dev/rfcomm0"
+    }
+  },
+  "scanner" : {
+    "usa"   : false,
+    "hwmac" : "00:0B:E4:XX:XX:XX",
+    "serial": {
+      "baudrate"  : 9600,
+      "databits"  : 7,
+      "autoopen"  : true,
+      "stopbits"  : 1,
+      "parity"    : "none",
+      "lock"      : true
+    }
+  },
+  "debug"   : {
+    "server"  : false,
+    "web"     : false,
+    "data"    : false
+  },
+  "remote"  : {
+    "connect"   : false,
+    "host"      : "",
+    "port"      : 6000,
+    "username"  : "",
+    "key"       : "",
+    "rights"    : {
+      "change" : {
+        "freq"  : false,
+        "mode"  : false
+      }
+    }
+  }
+}
+```
 
 ## Known Issues
 

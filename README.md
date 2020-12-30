@@ -153,6 +153,8 @@ pi@R30:~ $ cd Webinterface_ICOM_R30-main
 
 ### Compile node js sub projects with NPM 
 
+A list of packages can be find in [package.json](package.json) under **dependencies**.
+
 ```	
 pi@R30:~/Webinterface_ICOM_R30-main $ npm install
 ```
@@ -277,7 +279,7 @@ e.g: http://192.168.10.2:3000
 - [ ] Receive Log in sqlite database not working
 - [X] IC-R30 Bank name listing
 - [X] IC-R30 WX Mode not supported - i have no USA device
-- [X] Queue fills up when website is not in focus
+- [X] Queue fills up when website is not in focus - It is a protection from Chrome and Firefox, that socket request can be made only every 1 second - but we push every 100ms a new command
 
 ### Workaround Audio with VLC
 

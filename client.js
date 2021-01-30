@@ -5,6 +5,10 @@
 // # https://stackoverflow.com/questions/54013159/nodejs-http-listen-interferes-with-serialport-reads
 // # https://stackoverflow.com/questions/37545844/send-byte-0xff-with-node-js-through-serialport
 // #################################################
+/** Status Variables **/
+let status_bluetooth = false;
+let status_socket = false;
+
 /** Library to get the current script path **/
 const path          = require('path');
 const basedir       = path.dirname(__filename);
@@ -116,10 +120,20 @@ if (os.platform() === 'linux') {
             res.bluetooth = serial.isOpen;
             res.serial = serial;
 
+            res.status_serial = true;
+            res.status_bluetooth = true;
+
             console.info(color.blueBright('[INFO]') + ' Serial port ('+ config.server.devices.linux +') opened');
 
             onSerialConnect(socketServer);
-        }).catch((err) => console.error(color.redBright('[FAILED]') + ' Error: ', err))
+
+    }).catch(function(err)
+    {
+        res.status_serial = false;
+        res.status_bluetooth = false;
+
+        console.error(color.redBright('[FAILED]') + ' Error: ', err)
+    })
 } else {
     // ##########################
     // # Serial Windows Init
@@ -146,6 +160,7 @@ if (os.platform() === 'linux') {
     // # Serial on Error Actions
     // ##########################
     serial.on('error', function(data) {
+        req.status_serial = false;
         console.error(color.redBright('[FAILED]') + ' Error: ' + data);
     })
 
@@ -153,8 +168,9 @@ if (os.platform() === 'linux') {
     // # Serial on Close Action
     // ##########################
     serial.on('close', function() {
-        res.bluetooth = false;
-        req.bluetooth = false;
+        res.status_bluetooth = false;
+        req.status_serial = false;
+
         console.error(color.blueBright('[INFO]') + ' Serial port ('+ config.server.devices.win +') closed');
     })
 }
@@ -166,8 +182,14 @@ function onSocketConnect(socket) {
     console.info(color.yellowBright('[CONN]') + ' New Connection from : ' + socket.handshake.address);
 
     socket.emit('data', JSON.stringify({
-        'status'    : true,
-        'debug'     : 'Server listening on address : ' + socket.handshake.address
+        'statusbluetooth'   : res.status_bluetooth,
+        'statusserial'      : res.status_serial,
+        'statussocket'      : res.status_socket,
+        'debug'             : 'Server listening on address : ' + socket.handshake.address,
+        'versionweb'        : config.version.web,
+        'versionserver'     : config.version.server,
+        'debugweb'          : config.debug.web,
+        'usa'               : config.scanner.usa
     }));
 
     // ##########################
@@ -191,9 +213,17 @@ function onSocketConnect(socket) {
     });
 
     socket.on('close', function () {
+        res.status_socket = false;
+
         socket.emit('data', JSON.stringify({
-            'status'    : false,
-            'debug'     : 'Server closed'
+            'statusbluetooth'   : res.status_bluetooth,
+            'statusserial'      : res.status_serial,
+            'statussocket'      : res.status_socket,
+            'debug'             : 'Server closed',
+            'versionweb'        : config.version.web,
+            'versionserver'     : config.version.server,
+            'debugweb'          : config.debug.web,
+            'usa'               : config.scanner.usa
         }));
 
         console.log(color.redBright('[INFO] ') +'Socket Server closed');
@@ -235,7 +265,9 @@ function onSerialConnect(socket) {
             var obj = JSON.parse(res.init(cmd, subcmd, cmddata));
 
             socket.emit('data', JSON.stringify({
-                'status'            : true,
+                'statusbluetooth'  : res.status_bluetooth,
+                'statusserial'     : res.status_serial,
+                'statussocket'     : res.status_socket,
                 'cmd'               : cmd.toString(16),
                 'subcmd'            : (subcmd !== null)     ? subcmd.toString(16)   : null,
                 'cmddata'           : (cmddata !== null)    ? cmddata.toString(16)  : null,

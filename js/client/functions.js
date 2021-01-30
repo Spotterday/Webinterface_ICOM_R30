@@ -112,6 +112,18 @@ module.exports = {
             }
         }
     },
+    _get_audio_level_synchronize    : function (data = null) {
+        if (data !== null) {
+            switch (true) {
+                case (data == "00") :
+                    return 0;
+                case (data == "01") :
+                    return 1;
+                default:
+                    break;
+            }
+        }
+    },
     _get_afc                    : function (data = null) {
         if (data !== null) {
             switch (true) {
@@ -490,8 +502,5 @@ module.exports = {
                 case (data == "17") : return 17;
             }
         }
-    },
-    _get_audio_level_synchronize: function (data = null) {
-        // TODO : _get_audio_level_synchronize
     }
 }

@@ -7,6 +7,9 @@ module.exports = {
 
     serial      : null,
     bluetooth   : null,
+    status_serial : false,
+    status_bluetooth: false,
+    status_socket: false,
 
     init    : function (cmd = null, subcmd = null, data = null) {
         const color = require('chalk');

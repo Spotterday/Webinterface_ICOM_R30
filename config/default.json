@@ -1,7 +1,7 @@
 {
   "version" : {
-    "web" : "1.4.0",
-    "server" : "1.4.5"
+    "web" : "1.4.4",
+    "server" : "1.4.7"
   },
   "server"  : {
     "audio" : {

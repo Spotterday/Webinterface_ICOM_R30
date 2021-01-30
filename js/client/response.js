@@ -58,6 +58,9 @@ module.exports = {
                     case (subcmd == "04") :
                         resultdata = func._get_operating_mode(cmddata);
                     break;
+                    case (subcmd == "06") :
+                        resultdata = func._get_audio_level_synchronize(cmddata);
+                        break;
                     case (subcmd == "07") :
                         if (typeof cmddata !== 'undefined' && cmddata !== null && cmddata.length > 0 && cmddata[0] !== null) {
                             resultdata = func._get_af_gain_level(cmddata);

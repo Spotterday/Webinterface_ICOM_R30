@@ -137,33 +137,37 @@ Changing XX:XX:XX:XX:XX:XX trust succeeded
 [CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
 
 [bluetooth]# exit
-```	
+	
 
 Fallback is - you can do it via Desktop ;) 
 
 ![Linux 1](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/doc/img/linux1.png)
 ![Linux 2](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/doc/img/linux2.png)
+```
 
 ### Download IC-R30 Webinterface project from Github
 
-```	
+```
 pi@R30:~ $ wget https://github.com/Spotterday/Webinterface_ICOM_R30/archive/main.zip
 pi@R30:~ $ unzip main.zip
 pi@R30:~ $ cd Webinterface_ICOM_R30-main
 ```
 
 ### Update IC-R30 Webinterface * Optional
+
 ```	
 pi@R30:~ $ cp Webinterface_ICOM_R30-main/config/default.json ./default.json
 pi@R30:~ $ wget https://github.com/Spotterday/Webinterface_ICOM_R30/archive/main.zip
 pi@R30:~ $ unzip main.zip
 pi@R30:~ $ cp default.json Webinterface_ICOM_R30-main/config/
 pi@R30:~ $ rm -f default.json
-```	
+```
 
 ### Compile node js sub projects with NPM 
 
 A list of packages can be find in [package.json](package.json) under section **dependencies**.
+
+! On Unix put package **"node-bluetooth-serial-port": "tinyprinter/node-bluetooth-serial-port#master"** from package.json to optionalDependencies. It is only required on windows.
 
 ```	
 pi@R30:~/Webinterface_ICOM_R30-main $ npm install
@@ -181,7 +185,7 @@ pi@R30:~/Webinterface_ICOM_R30-main $ npm install
 ```	
 pi@R30:~/Webinterface_ICOM_R30-main $ cd config
 pi@R30:~/Webinterface_ICOM_R30-main/config $ nano default.json
-```	
+```
 
 The main part is the **server/devices** and **scanner/hwmac & scanner/serial**  section
 

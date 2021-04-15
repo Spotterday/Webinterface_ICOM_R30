@@ -38,7 +38,7 @@ module.exports = {
                 }
             break;
             case (cmd == "0C") :
-                resultdata = cmddata[0];
+                resultdata = func._get_scan_type(cmddata[0]);
             break;
             case (cmd == "0F") :
                 resultdata = func._get_dup(cmddata[0]);
@@ -68,6 +68,9 @@ module.exports = {
                             resultdata = null;
                         }
                     break;
+                    case (subcmd == "08"):
+                        resultdata = func._get_skip_mode(cmddata);
+                        break;
                     case (subcmd == "09"):
                         // Here nothing should came -1A 09 is only an execute command
                        break;
@@ -75,7 +78,6 @@ module.exports = {
                     case (subcmd == "11") :
                         // Display Content
                         resultdata = func._get_display_content(null, cmddata);
-                        // TODO : Open
                     break;
                     case (subcmd == "12") :
                         resultdata = JSON.stringify({
@@ -157,6 +159,9 @@ module.exports = {
             break;
             case (cmd == "16") :
                 switch (true) {
+                    case (subcmd == "4C"):
+                        resultdata = func._get_vsc(cmddata[0]);
+                        break;
                     case (subcmd == "22"):
                         resultdata = func._get_noise_blanker_status(cmddata[0]);
                         break;

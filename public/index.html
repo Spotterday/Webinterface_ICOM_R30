@@ -134,20 +134,18 @@
                                                         <option value="1">LSB</option>
                                                         <option value="2">USB</option>
                                                         <option value="3">AM</option>
-                                                        <option value="4">AM</option>
-                                                        <option value="5">AM-N</option>
-                                                        <option value="6">CW</option>
-                                                        <option value="7">FM</option>
-                                                        <option value="8">FM</option>
-                                                        <option value="9">FM-N</option>
-                                                        <option value="10">WFM</option>
-                                                        <option value="11">CW-R</option>
-                                                        <option value="12">P25</option>
-                                                        <option value="13">D-STAR</option>
-                                                        <option value="14">dPMR</option>
-                                                        <option value="15">NXDN-VN</option>
-                                                        <option value="16">NXDN-N</option>
-                                                        <option value="17">DCR</option>
+                                                        <option value="4">AM-N</option>
+                                                        <option value="5">CW</option>
+                                                        <option value="6">FM</option>
+                                                        <option value="7">FM-N</option>
+                                                        <option value="8">WFM</option>
+                                                        <option value="9">CW-R</option>
+                                                        <option value="10">P25</option>
+                                                        <option value="11">D-STAR</option>
+                                                        <option value="12">dPMR</option>
+                                                        <option value="13">NXDN-VN</option>
+                                                        <option value="14">NXDN-N</option>
+                                                        <option value="15">DCR</option>
                                                     </select>
                                                 </span>
 
@@ -274,20 +272,18 @@
                                                         <option value="1">LSB</option>
                                                         <option value="2">USB</option>
                                                         <option value="3">AM</option>
-                                                        <option value="4">AM</option>
-                                                        <option value="5">AM-N</option>
-                                                        <option value="6">CW</option>
-                                                        <option value="7">FM</option>
-                                                        <option value="8">FM</option>
-                                                        <option value="9">FM-N</option>
-                                                        <option value="10">WFM</option>
-                                                        <option value="11">CW-R</option>
-                                                        <option value="12">P25</option>
-                                                        <option value="13">D-STAR</option>
-                                                        <option value="14">dPMR</option>
-                                                        <option value="15">NXDN-VN</option>
-                                                        <option value="16">NXDN-N</option>
-                                                        <option value="17">DCR</option>
+                                                        <option value="4">AM-N</option>
+                                                        <option value="5">CW</option>
+                                                        <option value="6">FM</option>
+                                                        <option value="7">FM-N</option>
+                                                        <option value="8">WFM</option>
+                                                        <option value="9">CW-R</option>
+                                                        <option value="10">P25</option>
+                                                        <option value="11">D-STAR</option>
+                                                        <option value="12">dPMR</option>
+                                                        <option value="13">NXDN-VN</option>
+                                                        <option value="14">NXDN-N</option>
+                                                        <option value="15">DCR</option>
                                                     </select>
                                                 </span>
 
@@ -395,7 +391,8 @@
                                     <div class="btn-group pt-1">
                                         <button id="R_BTN_REQ_ATT" class="btn btn-primary" title="Attenuator">ATT</button>
                                         <button id="R_BTN_REQ_NB" class="btn btn-primary" title="Noise blanker">NB</button>
-                                        <button id="R_BTN_REQ_SKIP" class="btn btn-primary">SKIP</button>
+                                        <button id="R_BTN_REQ_T_SKIP" class="btn btn-primary">T-SKIP</button>
+                                        <button id="R_BTN_REQ_P_SKIP" class="btn btn-primary">P-SKIP</button>
                                         <button id="R_BTN_REQ_ANL" class="btn btn-primary" title="Automatic Noise Limiter">ANL</button>
                                         <button id="R_BTN_REQ_DUP" class="btn btn-primary" title="Duplex">DUP</button>
                                         <button id="R_BTN_REQ_AFC" class="btn btn-primary" title="Automatic Frequency Control">AFC</button>
@@ -403,15 +400,17 @@
 
                                     <div class="btn-group pt-1">
                                         <button id="R_BTN_REQ_AUDIO" class="btn btn-primary">Audio Mode</button>
-                                        <button id="" class="btn btn-primary"></button>
-                                        <button id="" class="btn btn-primary"></button>
-                                        <button id="" class="btn btn-primary"></button>
-                                        <button id="" class="btn btn-primary"></button>
-                                        <button id="" class="btn btn-primary"></button>
+                                        <button id="R_BTN_REQ_VSC" class="btn btn-primary">VSC</button>
+                                        <button class="btn btn-primary"></button>
+                                        <button class="btn btn-primary"></button>
+                                        <button class="btn btn-primary"></button>
+                                        <button class="btn btn-primary"></button>
                                     </div>
                                 </div>
 
                                 <div class="card">
+                                    <div class="card-header bg-light border-bottom header-elements-sm-inline pt-1 pb-1">Scan Options</div>
+
                                     <select id="R_SCAN_SELECT" style="font-size: 21px;" class="form-control select-search">
                                         <optgroup label="Default Search Modes">
                                             <option value="AL">ALL</option>
@@ -494,7 +493,7 @@
                             <div class="tab-content card-body p-0">
                                 <div class="tab-pane active fade show" id="log">
                                     <div class="card">
-                                        <table class="table datatable-basic table-striped" id="R_TABLE_RECIEVE_LOG">
+                                        <table class="table datatable-basic table-striped" id="R_TABLE_RECEIVE_LOG">
                                             <thead>
                                                 <tr>
                                                     <th>Frequency</th>

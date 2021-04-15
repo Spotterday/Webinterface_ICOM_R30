@@ -60,10 +60,10 @@ const sqlite3       = require('sqlite3').verbose();
 
 // https://github.com/meldron/node-alsa-capture
 
-const req = require(basedir+'/js/client/request.js')
-const res = require(basedir+'/js/client/response.js')
-const fun = require(basedir+'/js/client/functions.js')
-const sql = require(basedir+'/js/client/sql.js')
+const req = require('./js/client/request.js')
+const res = require('./js/client/response.js')
+const fun = require('./js/client/functions.js')
+const sql = require('./js/client/sql.js')
 
 let Clients = [];
 
@@ -276,13 +276,13 @@ function onSerialConnect(socket) {
                 'versionweb'        : config.version.web,
                 'versionserver'     : config.version.server,
                 'debugweb'          : config.debug.web,
-                'usa'               : config.scanner.usa
+                'usa'               : config.scanner.usa,
+                'serialbaudrate'    : config.scanner.serial.baudrate,
             }));
 
         });
     });
 }
-
 function onProcessTerminate(){
     sql.disconnect();
 

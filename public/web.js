@@ -1,32 +1,35 @@
 $(function () {
-    let sched_a = null;
-    let sched_b = null;
-    let socket       = io().connect();
+    let sched_a     = null;
+    let sched_b     = null;
+    let sched_queue = null;
+    let socket      = io().connect();
 
     let queue   = {
         store : [],
 
-        add : function (cmdjson = null) {
+        add     : function (cmdjson = null) {
             this.store.push(cmdjson);
         },
-        remove : function () {
+        remove  : function () {
             this.store.shift();
         },
-
-        clear : function () {
+        clear   : function () {
             this.store.splice(0,this.store.length)
         },
-
-        sched : function () {
-            setInterval(function () {
+        start   : function () {
+            sched_queue = setInterval(function () {
                 //console.log(queue.store);
-                $('#R_QUEUE').html(queue.store.length);
-                if (queue.store[0] !== 'undefined') {
+                $('#R_QUEUE').html(queue.store.length.toString());
+                if (queue.store[0] !== 'undefined' && typeof queue.store[0]!== 'undefined') {
+                    //console.log(queue.store[0]);
                     socket.emit('execute', queue.store[0]);
                 }
-                queue.store.shift();
-            }, 200);
+                queue.remove();
+            }, 5);
         },
+        stop    : function () {
+            clearInterval(sched_queue);
+        }
     };
     let r30		= {
         focused : false,
@@ -34,12 +37,15 @@ $(function () {
             // ##########################
             // # HTML Selector
             // ##########################
+            R_RECONNECT_SWITCH          : $('#R_RECONNECT_SWITCH'),
             R_SOCKET_STATUS             : $('#R_SOCKET_STATUS'),
             R_SERIAL_STATUS             : $('#R_SERIAL_STATUS'),
+            R_BLUETOOTH_STATUS          : $('#R_BLUETOOTH_STATUS'),
             R_AUDIO                     : $('#R_AUDIO'),
             R_SCAN_SELECT               : $('#R_SCAN_SELECT option'),
             R_QUEUE                     : $('#R_QUEUE'),
 
+            R_A_AUDIO                        : $('#R_A_AUDIO'),
             R_BAND_A                        : $('#R_BAND_A'),
             R_BAND_A_ACTIVE                 : $('#R_BAND_A_ACTIVE'),
             R_A_MEMORY_GROUP_NAME           : $('#R_A_MEMORY_GROUP_NAME'),
@@ -77,6 +83,7 @@ $(function () {
             R_A_ATT_ATT2                      : $('#R_A_ATT_ATT2'),
             R_A_ATT_ATT3                      : $('#R_A_ATT_ATT3'),
 
+            R_B_AUDIO                        : $('#R_B_AUDIO'),
             R_BAND_B                        : $('#R_BAND_B'),
             R_BAND_B_ACTIVE                 : $('#R_BAND_B_ACTIVE'),
             R_B_MEMORY_GROUP_NAME           : $('#R_B_MEMORY_GROUP_NAME'),
@@ -118,10 +125,6 @@ $(function () {
 
             R_DEBUG                         : $("#R_DEBUG"),
 
-
-
-
-
             R_AF_GAIN                       : $('#R_AF_GAIN'),
             R_AF_GAIN_SLIDER                : null,
             R_RF_GAIN                       : $('#R_RF_GAIN'),
@@ -133,15 +136,53 @@ $(function () {
             R_B_TUNING_STEP                 : $('#R_B_TUNING_STEP'),
             R_LOG                           : $('#R_LOG'),
         },
-        value   : {
-            usa             : false,
-            dual_band       : false,
-            main_band       : null,
-            bank_counter    : 0,
-            table_recieve_log : null,
-            memory_banks    : {},
+        const   : {
+            S_TIMER : 100,
+            BAND_A : 0,
+            BAND_B : 1,
+            RECEIVE_MODE : {
+                LSB : 1,
+                USB : 2,
+                AM  : 3,
+                AM_N : 4,
+                CW  : 5,
+                FM : 6,
+                FM_N : 7,
+                WFM : 8,
+                CW_R : 9,
+                P25 : 10,
+                D_STAR : 11,
+                DPMR : 12,
+                NXDN_VN : 13,
+                NXDN_N : 14,
+                DCR : 15
+            },
+            OPERATION_MODE : {
+                VFO : 0,
+                MEM : 1,
+                WX : 2,
+            },
+            SKIP_MODE : {
+                OFF : 0,
+                SKIP : 1,
+                PSKIP : 2
+            },
+            VSC : {
+                OFF:0,
+                ON:1,
+            }
         },
-        band : {
+        value   : {
+            serialbaudrate      : 9600,
+            usa                 : false,
+            dual_band           : false,
+            main_band           : null,
+            bank_counter        : 0,
+            table_receive_log   : null,
+            memory_banks        : {},
+            audio_mode          : 0,
+        },
+        band    : {
             0 : {
                 // Band A
                 rec             : false,    // Recording Status
@@ -153,6 +194,7 @@ $(function () {
                 dup             : 0,
                 afc             : 0,
                 att             : 0,
+                vsc             : 0,
                 smeter          : 0,
                 anl             : 0,
                 memory_bank_nr  : null,
@@ -161,13 +203,14 @@ $(function () {
             1 : {
                 // Band B
                 rec             : false,    // Recording Status
-                noise_blanker   : 0,
                 receive_mode    : 0,
+                noise_blanker   : 0,
                 operation_mode  : 0,        // 0 = VFO / 1 = Memory / 2 = WX
                 scan            : false,
                 scan_direction  : 'up',
                 dup             : 0,
                 att             : 0,
+                vsc             : 0,
                 afc             : 0,
                 smeter          : 0,
                 anl             : 0,
@@ -196,14 +239,20 @@ $(function () {
         },
         connect     : function () {
             socket.on('connect', function () {
+
                 r30.sel.R_SOCKET_STATUS.removeClass('bg-danger').addClass('bg-success');
                 r30.sel.R_SOCKET_STATUS.html('Online');
 
                 /** Start any actions after socket is successfully started **/
                 r30.data();
                 r30.audio();
-                queue.sched();
+                queue.start();
                 r30.init();
+            });
+        },
+        reconnect   : function () {
+            socket.on('reconnect', function () {
+
             });
         },
         disconnect  : function () {
@@ -236,8 +285,7 @@ $(function () {
 
         },
         data        : function () {
-
-            socket.on('data',function (data) {
+            socket.on('data', function (data = null) {
                 if (data !== null) {
                     let obj = JSON.parse(data);
 
@@ -249,16 +297,36 @@ $(function () {
                     $('#R_VERSION_SERVER').html(obj.versionserver);
 
                     r30.value.usa = obj.usa;
+                    r30.value.serialbaudrate = obj.serialbaudrate;
 
-                    switch (true) {
-                        case (typeof obj.status !== 'undefined' && obj.status === true) :
+                    if (typeof obj.statusbluetooth !== 'undefined') {
+                        if (obj.statusbluetooth === true) {
+                            r30.sel.R_BLUETOOTH_STATUS.addClass('bg-success');
+                            r30.sel.R_BLUETOOTH_STATUS.html('Online');
+                        }
+
+                        if (obj.statusbluetooth === false) {
+                            r30.sel.R_BLUETOOTH_STATUS.addClass('bg-danger');
+                            r30.sel.R_BLUETOOTH_STATUS.html('Offline');
+                        }
+                    }
+
+                    if (typeof obj.statusserial !== 'undefined') {
+                        if (obj.statusserial === true) {
                             r30.sel.R_SERIAL_STATUS.addClass('bg-success');
-                            r30.sel.R_SERIAL_STATUS.val('Online');
-                        break;
-                        case (typeof obj.status !== 'undefined' && obj.status === false) :
+                            r30.sel.R_SERIAL_STATUS.html('Online');
+                        }
+
+                        if (obj.statusserial === false) {
                             r30.sel.R_SERIAL_STATUS.addClass('bg-danger');
-                            r30.sel.R_SERIAL_STATUS.val('Offline');
-                       break;
+                            r30.sel.R_SERIAL_STATUS.html('Offline');
+                        }
+                    }
+
+                    if (obj.statusserial === false && obj.statusbluetooth === false) {
+                        r30.sel.R_RECONNECT_SWITCH.prop('checked', false);
+                    } else {
+                        r30.sel.R_RECONNECT_SWITCH.prop('checked', true);
                     }
 
                     switch (true) {
@@ -284,7 +352,7 @@ $(function () {
                             // Only FB or FA Feedback
                         break;
                         case (obj.cmd == "10") :
-                            r30.func.func_get_tuning_step(null, obj.cmdres);
+                            r30.func.func_get_tuning_step(r30.value.main_band, obj.cmdres);
                             break;
                         case (obj.cmd == "11") :
                             r30.func.func_get_att(r30.value.main_band, obj.cmdres);
@@ -347,6 +415,9 @@ $(function () {
                                 case (obj.subcmd == "04"):
                                     r30.func.func_get_operating_mode(r30.value.main_band, obj.cmdres);
                                 break;
+                                case (obj.subcmd == "06"):
+                                    r30.func.func_get_audio_level_synchronize(obj.cmdres);
+                                    break;
                                 case (obj.subcmd == "07"):
                                     r30.func.func_get_af_gain(obj.cmdres);
                                 break;
@@ -376,19 +447,20 @@ $(function () {
                                     r30.func.func_get_dup(data.main_band, data.dup);
                                     r30.func.func_get_att(data.main_band, data.att);
                                     r30.func.func_get_vsc(data.main_band, data.vsc);
-                                    r30.func.func_get_skip_mode(data.main_band, data.skip);
+                                    r30.func.func_get_skip_mode(data.main_band, data.skip_mode);
                                     r30.func.func_get_memory_group_name(data.main_band, data.mem_group_nr);
+                                    r30.func.func_get_rf_gain(data.rf_gain);
 
-                                    //r30.func.func_get_rf_gain(data.rf_gain);
+                                    // TODO : Scheduler check establishment
                                 break;
 
-                                case (obj.subcmd== "12"):
+                                case (obj.subcmd == "12"):
                                     var data = JSON.parse(obj.cmdres);
 
                                     r30.func.func_get_s_meter(r30.value.main_band, data.s_meter_lvl);
                                     r30.func.func_get_squelch_status(r30.value.main_band, data.squelch_status);
                                 break;
-                                case (obj.subcmd== "0B"):
+                                case (obj.subcmd == "0B"):
                                     if (obj.cmdres !== null) {
                                         try {
                                             var data = JSON.parse(obj.cmdres);
@@ -398,7 +470,7 @@ $(function () {
                                         }
                                     }
                                 break;
-                                case (obj.subcmd== "0C"):
+                                case (obj.subcmd == "0C"):
                                     // TODO: Scan Type not finished
                                     r30.func.func_get_scan_type();
                                 break;
@@ -416,7 +488,6 @@ $(function () {
 
                                     r30.value.dual_band = data.dual_band;
                                     r30.value.main_band = data.main_band;
-
                                     r30.func.func_set_r30_log(data.band, freq, data.mem_name);
                                     r30.func.func_get_frequency(data.band, freq, data.mem_name, data.receive_mode);
                                     r30.func.func_get_recording_condition(data.band, data.rec);
@@ -428,7 +499,7 @@ $(function () {
                                     r30.func.func_get_dup(data.band, data.dup);
                                     r30.func.func_get_att(data.band, data.att);
                                     r30.func.func_get_vsc(data.band, data.vsc);
-                                    r30.func.func_get_skip_mode(data.band, data.skip);
+                                    r30.func.func_get_skip_mode(data.band, data.skip_mode);
                                     r30.func.func_get_memory_group_name(data.band, data.mem_group_nr);
 
                                 } catch (e) { }
@@ -461,6 +532,8 @@ $(function () {
             });
         },
         html        : function () {
+            $(".switch").bootstrapSwitch();
+
             $.extend( $.fn.dataTable.defaults, {
                 autoWidth: false,
                 columnDefs: [{
@@ -478,9 +551,12 @@ $(function () {
 
             $('.select-search').select2();
 
-            r30.value.table_recieve_log = $('#R_TABLE_RECIEVE_LOG').DataTable();
+            r30.value.table_receive_log = $('#R_TABLE_RECEIVE_LOG').DataTable({
+                "order": [[ 2, "desc" ]]
+            });
 
             r30.sel.R_AF_GAIN.ionRangeSlider({
+                hide_min_max: true,
                 min: 0,
                 max: 39,
                 grid: true,
@@ -490,7 +566,9 @@ $(function () {
                     r30.cmd.set_af_gain_level(data.from);
                 },
             });
+
             r30.sel.R_RF_GAIN.ionRangeSlider({
+                hide_min_max: true,
                 min: 1,
                 max: 10,
                 grid: true,
@@ -500,6 +578,9 @@ $(function () {
                     r30.cmd.set_rf_gain_level(data.from);
                 },
             });
+
+            var squelch_label = ['Open', 'Auto', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
             r30.sel.R_SQUELCH_LEVEL.ionRangeSlider({
                 min: 0,
                 max: 10,
@@ -507,12 +588,12 @@ $(function () {
                 grid_num: 10,
                 step: 1,
                 prefix: "Squelch : ",
+                hide_min_max: true,
                 prettify: function (n) {
-                    var label = ['Open', 'Auto', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-                    return label[n];
+                    return squelch_label[n];
                 },
                 onFinish: function (data) {
-                    r30.cmd.set_squelch_level(data.from);
+                    r30.cmd.set_squelch_level(data.from, squelch_label);
                 },
             });
 
@@ -524,31 +605,83 @@ $(function () {
             // # Scoll events for frequency
             // #################################################
             $("input[name='R_A_FREQ_1'], input[name='R_A_FREQ_2'], input[name='R_A_FREQ_3'], input[name='R_A_FREQ_4'], input[name='R_A_FREQ_5'], input[name='R_A_FREQ_6'], input[name='R_A_FREQ_7'], input[name='R_A_FREQ_8'], input[name='R_A_FREQ_9'], input[name='R_A_FREQ_10'],input[name='R_B_FREQ_1'], input[name='R_B_FREQ_2'], input[name='R_B_FREQ_3'], input[name='R_B_FREQ_4'], input[name='R_B_FREQ_5'], input[name='R_B_FREQ_6'], input[name='R_B_FREQ_7'], input[name='R_B_FREQ_8'], input[name='R_B_FREQ_9'], input[name='R_B_FREQ_10']").on("mousewheel", function(event, delta) {
-                if (delta > 0) {
-                    if (this.value >= 9) {this.value = -1;}
+                if (delta > 0)
+                {
+                    if (this.value >= 9)
+                    {
+                        this.value = -1;
+                    }
+
                     this.value = parseInt(this.value) + 1;
-                } else {
-                    if (parseInt(this.value) > 0) {
+                }
+                else
+                {
+                    if (parseInt(this.value) > 0)
+                    {
                         this.value = parseInt(this.value) - 1;
+                    }
+
+                    if (parseInt(this.value) == 0)
+                    {
+                        this.value = 9;
                     }
                 }
                 return false;
+            });
+
+            $("input[name='R_A_FREQ_1'], input[name='R_A_FREQ_2'], input[name='R_A_FREQ_3'], input[name='R_A_FREQ_4'], input[name='R_A_FREQ_5'], input[name='R_A_FREQ_6'], input[name='R_A_FREQ_7'], input[name='R_A_FREQ_8'], input[name='R_A_FREQ_9'], input[name='R_A_FREQ_10'],input[name='R_B_FREQ_1'], input[name='R_B_FREQ_2'], input[name='R_B_FREQ_3'], input[name='R_B_FREQ_4'], input[name='R_B_FREQ_5'], input[name='R_B_FREQ_6'], input[name='R_B_FREQ_7'], input[name='R_B_FREQ_8'], input[name='R_B_FREQ_9'], input[name='R_B_FREQ_10']").on( "keydown", function (e) {
+                var data = String.fromCharCode(e.keyCode);
+                if ($.inArray(data, ["0","1","2","3","4","5","6","7","8","9"]) !== -1) {
+                    this.value = String.fromCharCode(e.keyCode);
+                    $(this).next().focus();
+                }
             });
 
             // TODO: URL automatically
             r30.sel.R_AUDIO.attr('src', 'http://192.168.10.9:8888/air.mp3?nocache=' + Math.floor((Math.random() * 1000000) + 1));
         },
         button      : function () {
+
+            $('#R_BTN_REQ_VSC').on( "click", function(){
+                r30.cmd.set_vsc();
+            });
+
+            $('#R_A_FREQ_MODE').on('select2:select', function (e) {
+                var data = e.params.data;
+                r30.cmd.set_receive_mode(data.id);
+            });
+
+            $('#R_B_FREQ_MODE').on('select2:select', function (e) {
+                var data = e.params.data;
+                r30.cmd.set_receive_mode(data.id);
+            });
+
+            $('#R_RECONNECT_SWITCH').on( "click", function(){
+                r30.cmd.set_on_off();
+            });
+
+            $('#R_BTN_REQ_T_SKIP').on( "click", function(){
+                r30.cmd.set_skip_mode();
+            });
+
+            $('#R_BTN_REQ_P_SKIP').on( "click", function(){
+                r30.cmd.set_skip_mode(true);
+            });
+
+            $('#R_BTN_REQ_AUDIO').on( "click", function(){
+                r30.cmd.set_audio_level_synchronize();
+            });
+
             $('#R_BTN_REQ_DUP').on( "click", function(){
                 r30.cmd.set_dup();
             });
 
             $('#R_BTN_REQ_SCAN').on( "click", function(){
-                // TODO : not finished
+                // TODO : web.js r30.button.R_BTN_REQ_SCAN
                 // #################################################
                 // # VFO Mode
                 // #################################################
-                if (r30.band[r30.value.main_band].operation_mode == 0) {
+                if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.VFO) {
 
                         if (r30.band[r30.value.main_band].scan == false) {
                             if (
@@ -561,32 +694,40 @@ $(function () {
 
                                 r30.cmd.set_scan_start($('#R_SCAN_SELECT option').filter(':selected').val());
 
-                                if (r30.value.main_band == 0) {
-                                    sched_a = setInterval(r30.sched[0], 1000);
+                                if (r30.value.main_band == r30.const.BAND_A) {
+                                    sched_a = setInterval(r30.sched[0], r30.const.S_TIMER);
+
+                                    r30.func.func_set_msg(false, 'Scan Band A started.');
                                 }
 
-                                if (r30.value.main_band == 1) {
-                                    sched_b = setInterval(r30.sched[1], 1000);
+                                if (r30.value.main_band == r30.const.BAND_B) {
+                                    sched_b = setInterval(r30.sched[1], r30.const.S_TIMER);
+
+                                    r30.func.func_set_msg(false, 'Scan Band B started.');
                                 }
                             } else {
                                 r30.func.func_set_msg(true, 'Scan options in VFO mode only [ALL | BAND | TONE | AUTO MW] ');
                             }
 
                         } else {
-                            if (r30.value.main_band == 0) {
-                                r30.band[0].scan = false;
+                            if (r30.value.main_band == r30.const.BAND_A) {
+                                r30.band[r30.const.BAND_A].scan = false;
 
                                 clearInterval(sched_a);
 
                                 r30.cmd.set_scan_stop();
+
+                                r30.func.func_set_msg(false, 'Scan stopped.');
                             }
 
-                            if (r30.value.main_band == 1) {
-                                r30.band[1].scan = false;
+                            if (r30.value.main_band == r30.const.BAND_B) {
+                                r30.band[r30.const.BAND_B].scan = false;
 
                                 clearInterval(sched_b);
 
                                 r30.cmd.set_scan_stop();
+
+                                r30.func.func_set_msg(false, 'Scan stopped.');
                             }
                         }
 
@@ -595,7 +736,7 @@ $(function () {
                 // #################################################
                 // # Memory Mode
                 // #################################################
-                if (r30.band[r30.value.main_band].operation_mode == 1) {
+                if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.MEM) {
                     if (r30.band[r30.value.main_band].scan == false) {
 
                         let value = $('#R_SCAN_SELECT option').filter(':selected').val();
@@ -610,12 +751,15 @@ $(function () {
                             r30.band[r30.value.main_band].scan = true;
                             r30.cmd.set_scan_start(value);
                             r30.func.func_get_scan_condition();
+
+                            r30.func.func_set_msg(false, 'Scan started.');
+
                         } else {
                             r30.func.func_set_msg(true, 'Scan options in MEM mode only [ALL | MODE | NEAR STATION | GROUP LINK | MEMORY GROUP ]  ');
                         }
 
                     } else {
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             r30.band[0].scan = false;
 
                             clearInterval(sched_a);
@@ -623,9 +767,11 @@ $(function () {
 
                             r30.cmd.set_scan_stop();
                             r30.func.func_get_scan_condition();
+
+                            r30.func.func_set_msg(false, 'Scan stopped.');
                         }
 
-                        if (r30.value.main_band == 1) {
+                        if (r30.value.main_band == r30.const.BAND_B) {
                             r30.band[1].scan = false;
 
                             clearInterval(sched_b);
@@ -633,6 +779,8 @@ $(function () {
 
                             r30.cmd.set_scan_stop();
                             r30.func.func_get_scan_condition();
+
+                            r30.func.func_set_msg(false, 'Scan stopped.');
                         }
                     }
                 }
@@ -640,7 +788,7 @@ $(function () {
                 // #################################################
                 // # WX Mode
                 // #################################################
-                if (r30.band[r30.value.main_band].operation_mode == 2) {
+                if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.WX) {
                     // TODO : Scan Button for WX Mode
                 }
             });
@@ -674,6 +822,9 @@ $(function () {
             $('#R_BTN_REQ_SWITCH_BAND').on( "click", function(){
                 r30.cmd.set_band();
                 r30.cmd.get_tuning_step();
+                r30.cmd.get_af_gain_level();
+                r30.cmd.get_rf_gain_level();
+                r30.cmd.get_squelch_level();
                 r30.func.func_get_select_band();
             });
 
@@ -701,10 +852,12 @@ $(function () {
             });
 
             $('#R_BTN_REQ_SET').on( "click", function(){
-                if (r30.band[r30.value.main_band].operation_mode == 0) {
+                if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.VFO) {
                     r30.cmd.set_frequency();
                 } else {
-                    r30.func.func_set_msg(true, 'Frequency could only be set on VFO mode.');
+                    r30.cmd.set_operating_mode(r30.value.main_band, r30.const.OPERATION_MODE.VFO);
+
+                    r30.cmd.set_frequency();
                 }
             });
 
@@ -738,13 +891,13 @@ $(function () {
 
                     if ($('#R_' + md5).length <= 0) {
 
-                        r30.value.table_recieve_log.row.add([
+                        r30.value.table_receive_log.row.add([
                             freq[8] +'.'+ freq[9] +''+ freq[6] +''+ freq[7] +'.'+ freq[4] +''+ freq[5] +''+ freq[2] +'.'+ freq[3] +''+ freq[0] +''+ freq[1],
                             freq_name,
                             timestamp
                         ]).node().id = 'R_'+md5;
 
-                        r30.value.table_recieve_log.draw( false );
+                        r30.value.table_receive_log.draw( false );
                     }
                 }
             },
@@ -755,7 +908,7 @@ $(function () {
 
                         switch(true) {
                             case (data == 0):
-                                if (band == 0) {
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
@@ -766,7 +919,7 @@ $(function () {
                                 }
                                 break;
                             case (data == 1):
-                                if (band == 0) {
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
@@ -777,7 +930,7 @@ $(function () {
                                 }
                                 break;
                             case (data == 2):
-                                if (band == 0) {
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-success').addClass('badge-info');
@@ -790,8 +943,8 @@ $(function () {
                         }
                     } else {
                         switch(true) {
-                            case (r30.band[band].operation_mode == 0):
-                                if (band == 0) {
+                            case (r30.band[band].operation_mode == r30.const.OPERATION_MODE.VFO):
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
@@ -801,8 +954,8 @@ $(function () {
                                     r30.sel.R_B_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
                                 }
                                 break;
-                            case (r30.band[band].operation_mode == 1):
-                                if (band == 0) {
+                            case (r30.band[band].operation_mode == r30.const.OPERATION_MODE.MEM):
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
@@ -812,8 +965,8 @@ $(function () {
                                     r30.sel.R_B_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
                                 }
                                 break;
-                            case (r30.band[band].operation_mode == 2):
-                                if (band == 0) {
+                            case (r30.band[band].operation_mode == r30.const.OPERATION_MODE.WX):
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-success').addClass('badge-info');
@@ -830,8 +983,8 @@ $(function () {
                         r30.band[r30.value.main_band].operation_mode = data;
 
                         switch(true) {
-                            case (data == 0):
-                                if (r30.value.main_band == 0) {
+                            case (data == r30.const.OPERATION_MODE.VFO):
+                                if (r30.value.main_band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
@@ -841,8 +994,8 @@ $(function () {
                                     r30.sel.R_B_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
                                 }
                                 break;
-                            case (data == 1):
-                                if (r30.value.main_band == 0) {
+                            case (data == r30.const.OPERATION_MODE.MEM):
+                                if (r30.value.main_band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
@@ -852,8 +1005,8 @@ $(function () {
                                     r30.sel.R_B_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
                                 }
                                 break;
-                            case (data == 2):
-                                if (r30.value.main_band == 0) {
+                            case (data == r30.const.OPERATION_MODE.WX):
+                                if (r30.value.main_band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-success').addClass('badge-info');
@@ -866,8 +1019,8 @@ $(function () {
                         }
                     } else {
                         switch(true) {
-                            case (r30.band[r30.value.main_band].operation_mode == 0):
-                                if (r30.value.main_band == 0) {
+                            case (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.VFO):
+                                if (r30.value.main_band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
@@ -877,8 +1030,8 @@ $(function () {
                                     r30.sel.R_B_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
                                 }
                                 break;
-                            case (r30.band[r30.value.main_band].operation_mode == 1):
-                                if (r30.value.main_band == 0) {
+                            case (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.MEM):
+                                if (r30.value.main_band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
@@ -888,8 +1041,8 @@ $(function () {
                                     r30.sel.R_B_OPERATION_MODE_WX.removeClass('badge-success').addClass('badge-info');
                                 }
                                 break;
-                            case (r30.band[r30.value.main_band].operation_mode == 2):
-                                if (r30.value.main_band == 0) {
+                            case (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.WX):
+                                if (r30.value.main_band == r30.const.BAND_A) {
                                     r30.sel.R_A_OPERATION_MODE_WX.removeClass('badge-info').addClass('badge-success');
                                     r30.sel.R_A_OPERATION_MODE_VFO.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_OPERATION_MODE_MEM.removeClass('badge-success').addClass('badge-info');
@@ -904,17 +1057,18 @@ $(function () {
                 }
             },
             func_get_receive_mode           : function (band = null, data = null) {
+                //console.log("receive_mode : " + data);
                 if (band !== null) {
                     if (data !== null) {
                         r30.band[band].receive_mode = data;
 
-                        if (band == 0) {
+                        if (band == r30.const.BAND_A) {
                             r30.sel.R_A_FREQ_MODE.val(data).trigger("change");
                         } else {
                             r30.sel.R_B_FREQ_MODE.val(data).trigger("change");
                         }
                     } else {
-                        if (band == 0) {
+                        if (band == r30.const.BAND_A) {
                             r30.sel.R_A_FREQ_MODE.val(r30.band[band].receive_mode).trigger("change");
                         } else {
                             r30.sel.R_B_FREQ_MODE.val(r30.band[band].receive_mode).trigger("change");
@@ -924,13 +1078,13 @@ $(function () {
                     if (data !== null) {
                         r30.band[r30.value.main_band].receive_mode = data;
 
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             r30.sel.R_A_FREQ_MODE.val(data).trigger("change");
                         } else {
                             r30.sel.R_B_FREQ_MODE.val(data).trigger("change");
                         }
                     } else {
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             r30.sel.R_A_FREQ_MODE.val(r30.band[r30.value.main_band].receive_mode).trigger("change");
                         } else {
                             r30.sel.R_B_FREQ_MODE.val(r30.band[r30.value.main_band].receive_mode).trigger("change");
@@ -940,7 +1094,7 @@ $(function () {
             },
             func_get_select_band            : function () {
                 if (r30.value.dual_band == false) {
-                    if (r30.value.main_band == 0) {
+                    if (r30.value.main_band == r30.const.BAND_A) {
                         r30.sel.R_BAND_A.show();
                         r30.sel.R_BAND_B.hide();
 
@@ -954,7 +1108,7 @@ $(function () {
                         r30.sel.R_BAND_A_ACTIVE.removeClass('bg-green-300').addClass('bg-light');
                     }
                 } else {
-                    if (r30.value.main_band == 0) {
+                    if (r30.value.main_band == r30.const.BAND_A) {
                         r30.sel.R_BAND_A.show();
                         r30.sel.R_BAND_B.show();
 
@@ -976,7 +1130,7 @@ $(function () {
                             // stopped
                             r30.band[band].rec = false;
 
-                            if (band == 0) {
+                            if (band == r30.const.BAND_A) {
                                 r30.sel.R_A_REC.removeClass('badge-success').removeClass('badge-danger').addClass('badge-info');
                             } else {
                                 r30.sel.R_B_REC.removeClass('badge-success').removeClass('badge-danger').addClass('badge-info');
@@ -986,7 +1140,7 @@ $(function () {
                             // pause
                             r30.band[band].rec = true;
 
-                            if (band == 0) {
+                            if (band == r30.const.BAND_A) {
                                 r30.sel.R_A_REC.removeClass('badge-info').removeClass('badge-danger').addClass('badge-success');
                             } else {
                                 r30.sel.R_B_REC.removeClass('badge-info').removeClass('badge-danger').addClass('badge-success');
@@ -995,7 +1149,7 @@ $(function () {
                         case (data == 2) :
                             r30.band[band].rec = true;
 
-                            if (band == 0) {
+                            if (band == r30.const.BAND_A) {
                                 r30.sel.R_A_REC.removeClass('badge-success').removeClass('badge-info').addClass('badge-danger');
                             } else {
                                 r30.sel.R_B_REC.removeClass('badge-success').removeClass('badge-info').addClass('badge-danger');
@@ -1010,7 +1164,7 @@ $(function () {
 
                     let value = Math.round((100 / 255) * data);
 
-                    if (band == 0) {
+                    if (band == r30.const.BAND_A) {
                         r30.sel.R_A_S_METER.css("width", value +"%");
                         r30.sel.R_A_S_METER.html('<span>'+ value + '</span>');
                     } else {
@@ -1019,9 +1173,25 @@ $(function () {
                     }
                 }
             },
+            func_get_audio_level_synchronize: function (data = null) {
+                if (data !== null) {
+                    r30.value.audio_mode = data;
+
+                    if (data == 0) {
+                        // 00=A/B Link
+                        r30.sel.R_A_AUDIO.html('A=B').prop('title', 'Audio A=B Link');
+                        r30.sel.R_B_AUDIO.html('A=B').prop('title', 'Audio A=B Link');
+                    } else {
+                        // 01=A/B Separate
+                        r30.sel.R_A_AUDIO.html('A/B').prop('title', 'Audio A/B Separate');
+                        r30.sel.R_B_AUDIO.html('A/B').prop('title', 'Audio A/B Separate');
+                    }
+                }
+
+            },
             func_get_squelch_status         : function (band = null, data = null) {
                 if (data !== null) {
-                    if (band == 0) {
+                    if (band == r30.const.BAND_A) {
                         if (data == 0) {
                             r30.sel.R_A_S_METER_SQUELCH_STATUS.removeClass('badge-success').addClass('badge-info');
                         } else {
@@ -1037,7 +1207,7 @@ $(function () {
                 }
             },
             func_get_frequency              : function (band = null, data = null, mem_name = null, receive_mode = null) {
-                if (band == 0) {
+                if (band == r30.const.BAND_A) {
                     if (data !== null) {
                         r30.sel.R_A_FREQ_1.val(data[8]);
                         r30.sel.R_A_FREQ_2.val(data[9]);
@@ -1051,7 +1221,7 @@ $(function () {
                         r30.sel.R_A_FREQ_10.val(data[1]);
                     }
 
-                    if (mem_name !== null)      {
+                    if (mem_name !== null && mem_name !== "")      {
                         r30.sel.R_A_FREQ_NAME.html(mem_name);
                     } else {
                         r30.sel.R_A_FREQ_NAME.html('----------');
@@ -1073,6 +1243,7 @@ $(function () {
                         r30.sel.R_B_FREQ_9.val(data[0]);
                         r30.sel.R_B_FREQ_10.val(data[1]);
                     }
+
                     if (mem_name !== null)      {
                         r30.sel.R_B_FREQ_NAME.html(mem_name);
                     } else {
@@ -1086,8 +1257,10 @@ $(function () {
             },
             func_get_rf_gain                : function (data = null) {
                 if (data !== null) {
-                    r30.sel.R_RF_GAIN.data('from', data);
-                    r30.sel.R_RF_GAIN_SLIDER.update({from: data});
+                    if (data !== r30.sel.R_RF_GAIN_SLIDER.result.from) {
+                        r30.sel.R_RF_GAIN.data('from', data);
+                        r30.sel.R_RF_GAIN_SLIDER.update({from: data});
+                    }
                 }
             },
             func_get_af_gain                : function (data = null) {
@@ -1103,7 +1276,7 @@ $(function () {
 
                         switch (true) {
                             case (data == 0) :
-                                if (band == 0) {
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_DUP_MIN.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_DUP_PLU.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_DUP_OFF.removeClass('badge-info').addClass('badge-success');
@@ -1115,7 +1288,7 @@ $(function () {
 
                                 break;
                             case (data == 1) :
-                                if (band == 0) {
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_DUP_OFF.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_DUP_PLU.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_DUP_MIN.removeClass('badge-info').addClass('badge-success');
@@ -1127,7 +1300,7 @@ $(function () {
 
                                 break;
                             case (data == 2) :
-                                if (band == 0) {
+                                if (band == r30.const.BAND_A) {
                                     r30.sel.R_A_DUP_OFF.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_DUP_MIN.removeClass('badge-success').addClass('badge-info');
                                     r30.sel.R_A_DUP_PLU.removeClass('badge-info').addClass('badge-success');
@@ -1151,7 +1324,7 @@ $(function () {
                     r30.band[band].anl = data;
 
                     if (r30.value.dual_band == true) {
-                        if (band == 0) {
+                        if (band == r30.const.BAND_A) {
                             if (data == 0) {
                                 r30.sel.R_A_FREQ_ANL.removeClass('badge-success').addClass('badge-info');
                             } else {
@@ -1165,7 +1338,7 @@ $(function () {
                             }
                         }
                     } else {
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             if (data == 0) {
                                 r30.sel.R_A_FREQ_ANL.removeClass('badge-success').addClass('badge-info');
                             } else {
@@ -1180,7 +1353,7 @@ $(function () {
                         }
                     }
                 } else {
-                    if (r30.value.main_band == 0) {
+                    if (r30.value.main_band == r30.const.BAND_A) {
                         if (r30.band[0].anl == 0) {
                             r30.sel.R_A_FREQ_ANL.removeClass('badge-success').addClass('badge-info');
                         } else {
@@ -1197,7 +1370,7 @@ $(function () {
             },
             func_get_afc                    : function (band = null, data = null) {
                 if (data !== null) {
-                    if (band == 0) {
+                    if (band == r30.const.BAND_A) {
                         if (data == 0) {
                             r30.sel.R_A_AFC.removeClass('badge-success').addClass('badge-info');
                             r30.band[band].afc = 0;
@@ -1222,7 +1395,7 @@ $(function () {
 
                     switch (true) {
                         case (data == 0) :
-                            if (band == 0) {
+                            if (band == r30.const.BAND_A) {
                                 r30.sel.R_A_ATT_OFF.removeClass('badge-info').addClass('badge-success');
                                 r30.sel.R_A_ATT_ATT1.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_A_ATT_ATT2.removeClass('badge-success').addClass('badge-info');
@@ -1235,7 +1408,7 @@ $(function () {
                             }
                             break;
                         case (data == 1) :
-                            if (band == 0) {
+                            if (band == r30.const.BAND_A) {
                                 r30.sel.R_A_ATT_ATT1.removeClass('badge-info').addClass('badge-success');
                                 r30.sel.R_A_ATT_OFF.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_A_ATT_ATT2.removeClass('badge-success').addClass('badge-info');
@@ -1248,7 +1421,7 @@ $(function () {
                             }
                             break;
                         case (data == 2) :
-                            if (band == 0) {
+                            if (band == r30.const.BAND_A) {
                                 r30.sel.R_A_ATT_ATT2.removeClass('badge-info').addClass('badge-success');
                                 r30.sel.R_A_ATT_OFF.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_A_ATT_ATT1.removeClass('badge-success').addClass('badge-info');
@@ -1261,7 +1434,7 @@ $(function () {
                             }
                             break;
                         case (data == 3) :
-                            if (band == 0) {
+                            if (band == r30.const.BAND_A) {
                                 r30.sel.R_A_ATT_ATT3.removeClass('badge-info').addClass('badge-success');
                                 r30.sel.R_A_ATT_OFF.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_A_ATT_ATT1.removeClass('badge-success').addClass('badge-info');
@@ -1276,7 +1449,7 @@ $(function () {
                     }
                 } else {
                     if (r30.value.dual_band == false) {
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             switch (true) {
                                 case (r30.band[0].att == 0) :
                                         r30.sel.R_A_ATT_OFF.removeClass('badge-info').addClass('badge-success');
@@ -1339,7 +1512,7 @@ $(function () {
                     if (data !== null) {
                         r30.band[band].noise_blanker = data;
 
-                        if (band == 0) {
+                        if (band == r30.const.BAND_A) {
                             if (data == 0) {
                                 r30.sel.R_A_NB.removeClass('badge-success').addClass('badge-info');
                             } else {
@@ -1359,7 +1532,7 @@ $(function () {
                     if (data !== null) {
                         r30.band[r30.value.main_band].noise_blanker = data;
 
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             if (data == 0) {
                                 r30.sel.R_A_NB.removeClass('badge-success').addClass('badge-info');
                             } else {
@@ -1375,7 +1548,7 @@ $(function () {
                     } else {
                         r30.band[r30.value.main_band].noise_blanker = 0;
 
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             r30.sel.R_A_NB.removeClass('badge-success').addClass('badge-info');
                         } else {
                             r30.sel.R_B_NB.removeClass('badge-success').addClass('badge-info');
@@ -1387,18 +1560,22 @@ $(function () {
             func_get_tuning_step            : function (band = null, data = null) {
                 if (band !== null) {
                     if (data !== null) {
-                        if (band == 0) {
+                        if (band == r30.const.BAND_A) {
                             r30.sel.R_A_TUNING_STEP.val(data);
+                            r30.sel.R_A_TUNING_STEP.trigger('change');
                         } else {
                             r30.sel.R_B_TUNING_STEP.val(data);
+                            r30.sel.R_B_TUNING_STEP.trigger('change');
                         }
                     }
                 } else {
                     if (data !== null) {
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             r30.sel.R_A_TUNING_STEP.val(data);
+                            r30.sel.R_A_TUNING_STEP.trigger('change');
                         } else {
                             r30.sel.R_B_TUNING_STEP.val(data);
+                            r30.sel.R_B_TUNING_STEP.trigger('change');
                         }
                     }
                 }
@@ -1407,25 +1584,29 @@ $(function () {
             func_get_vsc                    : function (band = null, data = null) {
                 if (data !== null) {
                     switch (true) {
-                        case (data == "00") :
-                            if (band == 0) {
+                        case (data == r30.const.VSC.OFF) :
+                            if (band == r30.const.BAND_A) {
+                                r30.band[r30.const.BAND_A].vsc = r30.const.VSC.OFF;
                                 r30.sel.R_A_VSC.addClass('badge-info').removeClass('badge-success');
                             } else {
-                                r30.sel.R_A_VSC.removeClass('badge-info').addClass('badge-success');
-                            }
-                            break;
-                        case (data == "01") :
-                            if (band == 0) {
+                                r30.band[r30.const.BAND_B].vsc = r30.const.VSC.OFF;
                                 r30.sel.R_B_VSC.addClass('badge-info').removeClass('badge-success');
-                            } else {
-                                r30.sel.R_B_VSC.removeClass('badge-info').addClass('badge-success');
                             }
-                            break;
+                        break;
+                        case (data == r30.const.VSC.ON) :
+                            if (band == r30.const.BAND_A) {
+                                r30.band[r30.const.BAND_A].vsc = r30.const.VSC.ON;
+                                r30.sel.R_A_VSC.addClass('badge-success').removeClass('badge-info');
+                            } else {
+                                r30.band[r30.const.BAND_B].vsc = r30.const.VSC.ON;
+                                r30.sel.R_B_VSC.addClass('badge-success').removeClass('badge-info');
+                            }
+                        break;
                     }
                 }
             },
             func_get_scan_type              : function (band = null, data = null) {
-                // TODO : func_get_scan_type
+                // TODO : web.js r30.func.func_get_scan_type
             },
             func_get_scan_condition         : function (data = null) {
                 if (data !== null && data[0] !== "" && data[1] !== "") {
@@ -1436,7 +1617,7 @@ $(function () {
 
                     if (r30.band[0].scan == true) {
                         if (sched_a == null) {
-                            sched_a = setInterval(r30.sched[0], 1000);
+                            sched_a = setInterval(r30.sched[0], r30.const.S_TIMER);
                         }
 
                         r30.sel.R_A_SCAN.addClass('badge-success').removeClass('badge-info');
@@ -1446,7 +1627,7 @@ $(function () {
 
                     if (r30.band[1].scan == true) {
                         if (sched_b == null) {
-                            sched_b = setInterval(r30.sched[1], 500);
+                            sched_b = setInterval(r30.sched[1], r30.const.S_TIMER);
                         }
 
                         r30.sel.R_B_SCAN.addClass('badge-success').removeClass('badge-info');
@@ -1456,7 +1637,7 @@ $(function () {
                 } else {
                     if (r30.band[0].scan == true) {
                         if (sched_a == null) {
-                            sched_a = setInterval(r30.sched[0], 1000);
+                            sched_a = setInterval(r30.sched[0], r30.const.S_TIMER);
                         }
 
                         r30.sel.R_A_SCAN.addClass('badge-success').removeClass('badge-info');
@@ -1466,7 +1647,7 @@ $(function () {
 
                     if (r30.band[1].scan == true) {
                         if (sched_b == null) {
-                            sched_b = setInterval(r30.sched[1], 1000);
+                            sched_b = setInterval(r30.sched[1], r30.const.S_TIMER);
                         }
 
                         r30.sel.R_B_SCAN.addClass('badge-success').removeClass('badge-info');
@@ -1512,13 +1693,13 @@ $(function () {
 
                 if (band !== null) {
                     if (data !== null) {
-                        if (band == 0) {
+                        if (band == r30.const.BAND_A) {
                             r30.sel.R_A_MEMORY_GROUP_NAME.html(r30.value.memory_banks[data.substring(2)]);
                         } else {
                             r30.sel.R_B_MEMORY_GROUP_NAME.html(r30.value.memory_banks[data.substring(2)]);
                         }
                     } else {
-                        if (band == 0) {
+                        if (band == r30.const.BAND_A) {
                             r30.sel.R_A_MEMORY_GROUP_NAME.html('Unknown Bank');
                         } else {
                             r30.sel.R_B_MEMORY_GROUP_NAME.html('Unknown Bank');
@@ -1526,13 +1707,13 @@ $(function () {
                     }
                 } else {
                     if (data !== null) {
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             r30.sel.R_A_MEMORY_GROUP_NAME.html(r30.value.memory_banks[data.substring(2)]);
                         } else {
                             r30.sel.R_B_MEMORY_GROUP_NAME.html(r30.value.memory_banks[data.substring(2)]);
                         }
                     } else {
-                        if (r30.value.main_band == 0) {
+                        if (r30.value.main_band == r30.const.BAND_A) {
                             r30.sel.R_A_MEMORY_GROUP_NAME.html('Unknown Bank');
                         } else {
                             r30.sel.R_B_MEMORY_GROUP_NAME.html('Unknown Bank');
@@ -1542,19 +1723,19 @@ $(function () {
             },
             func_get_skip_mode              : function (band = null, data = null) {
                 if (data !== null) {
-                    if (band == 0) {
+                    if (band == r30.const.BAND_A) {
                         switch (true) {
-                            case (data == 0) :
+                            case (data == r30.const.SKIP_MODE.OFF) :
                                 r30.sel.R_A_SKIP_OFF.addClass('badge-success').removeClass('badge-info');
                                 r30.sel.R_A_SKIP_SKIP.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_A_SKIP_PSKIP.removeClass('badge-success').addClass('badge-info');
                             break;
-                            case (data == 1) :
+                            case (data == r30.const.SKIP_MODE.SKIP) :
                                 r30.sel.R_A_SKIP_SKIP.addClass('badge-success').removeClass('badge-info');
                                 r30.sel.R_A_SKIP_OFF.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_A_SKIP_PSKIP.removeClass('badge-success').addClass('badge-info');
                             break;
-                            case (data == 2) :
+                            case (data == r30.const.SKIP_MODE.PSKIP) :
                                 r30.sel.R_A_SKIP_PSKIP.addClass('badge-success').removeClass('badge-info');
                                 r30.sel.R_A_SKIP_OFF.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_A_SKIP_SKIP.removeClass('badge-success').addClass('badge-info');
@@ -1563,17 +1744,17 @@ $(function () {
 
                     } else {
                         switch (true) {
-                            case (data == 0) :
+                            case (data == r30.const.SKIP_MODE.OFF) :
                                 r30.sel.R_B_SKIP_OFF.addClass('badge-success').removeClass('badge-info');
                                 r30.sel.R_B_SKIP_SKIP.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_B_SKIP_PSKIP.removeClass('badge-success').addClass('badge-info');
                                 break;
-                            case (data == 1) :
+                            case (data == r30.const.SKIP_MODE.SKIP) :
                                 r30.sel.R_B_SKIP_SKIP.addClass('badge-success').removeClass('badge-info');
                                 r30.sel.R_B_SKIP_OFF.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_B_SKIP_PSKIP.removeClass('badge-success').addClass('badge-info');
                                 break;
-                            case (data == 2) :
+                            case (data == r30.const.SKIP_MODE.PSKIP) :
                                 r30.sel.R_B_SKIP_PSKIP.addClass('badge-success').removeClass('badge-info');
                                 r30.sel.R_B_SKIP_OFF.removeClass('badge-success').addClass('badge-info');
                                 r30.sel.R_B_SKIP_SKIP.removeClass('badge-success').addClass('badge-info');
@@ -1588,6 +1769,10 @@ $(function () {
             // ##########################
             // # Execute Commands
             // ##########################
+            // TODO : r30.cmd.set_on_off
+            set_on_off                  : function () {
+                //queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x03', 'data': '0x01', 'timestamp' : r30.timestamp()}));
+            },
             set_up_down                 : function (direction = 'u') {
                 if (direction === 'u') {
                     queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x03', 'data': '0x01', 'timestamp' : r30.timestamp()}));
@@ -1600,19 +1785,29 @@ $(function () {
             set_single_dual_band_mode   : function (dual = false) {
                 if (dual === false) {
                     queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': '0x59', 'data': '0x00', 'timestamp' : r30.timestamp()}));
+
+                    r30.func.func_set_msg(false, 'Single Band mode initiated.');
                 } else {
                     queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': '0x59', 'data': '0x01', 'timestamp' : r30.timestamp()}));
+
+                    r30.func.func_set_msg(false, 'Dual Band mode initiated.');
                 }
 
                 return true;
             },
             set_band                    : function () {
-                if (r30.value.main_band == 0) {
+                if (r30.value.main_band == r30.const.BAND_A) {
                     queue.add(JSON.stringify({'cmd':['0x07'], 'subcmd': '0xD1', 'data': null, 'timestamp' : r30.timestamp()}));
-                    r30.value.main_band = 1;
+                    r30.func.func_set_msg(false, 'Switch Band to B initiated.');
+                    if (r30.band["1"].scan === false) {
+                        r30.value.main_band = 1;
+                    }
                 } else {
                     queue.add(JSON.stringify({'cmd':['0x07'], 'subcmd': '0xD0', 'data': null, 'timestamp' : r30.timestamp()}));
-                    r30.value.main_band = 0;
+                    r30.func.func_set_msg(false, 'Switch Band to A initiated.');
+                    if (r30.band["0"].scan === false) {
+                        r30.value.main_band = 0;
+                    }
                 }
 
                 return true;
@@ -1620,7 +1815,7 @@ $(function () {
             set_frequency               : function () {
                 let freq1, freq2, freq3, freq4, freq5, freq6, freq7, freq8, freq9, freq10;
 
-                if (r30.value.main_band == 0) {
+                if (r30.value.main_band == r30.const.BAND_A) {
                     freq1 = r30.sel.R_A_FREQ_1.val().toString(16);
                     freq2 = r30.sel.R_A_FREQ_2.val().toString(16);
                     freq3 = r30.sel.R_A_FREQ_3.val().toString(16);
@@ -1644,10 +1839,12 @@ $(function () {
                     freq10 = r30.sel.R_B_FREQ_10.val().toString(16);
                 }
 
-                if (r30.band[r30.value.main_band].operation_mode == 0) {
+                // operation_mode = VFO
+                if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.VFO) {
                     queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x02', 'data': ["0x" +freq9+freq10, "0x" +freq7+freq8, "0x" +freq5+freq6, "0x" +freq3+freq4, "0x" +freq1+freq2], 'timestamp' : r30.timestamp()}));
-                    // TODO : add Frequency to output
-                    r30.func.func_set_msg(false, 'Frequency was set.');
+
+                    // TODO : add Band B Check for Freq <= 108  MHZ not possible
+                    r30.func.func_set_msg(false, 'Frequency ['+freq1+'.'+freq2+freq3+freq4+'.'+freq5+freq6+freq7+'.'+freq8+freq9+freq10+'] was set.');
                 }
 
                 return true;
@@ -1663,7 +1860,7 @@ $(function () {
                     // #################################################
                     // # VFO
                     // #################################################
-                    if (r30.band[r30.value.main_band].operation_mode == 0) {
+                    if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.VFO) {
                         switch (true) {
                             case (scan_option == 'AL') :
                                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x00'], 'timestamp' : r30.timestamp()}));
@@ -1680,7 +1877,7 @@ $(function () {
                     // #################################################
                     // # MEMORY
                     // #################################################
-                    if (r30.band[r30.value.main_band].operation_mode == 1) {
+                    if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.MEM) {
                         switch (true) {
                             case (scan_option.includes("AL")) :
                                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x04'], 'timestamp' : r30.timestamp()}));
@@ -1701,8 +1898,6 @@ $(function () {
 
                         }
                     }
-                } else {
-
                 }
 
                 return true;
@@ -1762,9 +1957,9 @@ $(function () {
                     39 : ['0x02','0x50']
                 };
 
-                setTimeout(() => {
-                    queue.add(JSON.stringify({'cmd':['0x14'], 'subcmd': '0x01', 'data': level_raw[af_level], 'timestamp' : r30.timestamp()}));
-                }, 200);
+                queue.add(JSON.stringify({'cmd':['0x14'], 'subcmd': '0x01', 'data': level_raw[af_level], 'timestamp' : r30.timestamp()}));
+
+                r30.func.func_set_msg(false, 'AF Gain was set to '+af_level+' for band '+ ((r30.value.main_band == r30.const.BAND_A) ? 'A' : 'B'));
 
                 return true;
             },
@@ -1784,9 +1979,11 @@ $(function () {
 
                 queue.add(JSON.stringify({'cmd':['0x14'], 'subcmd': '0x02', 'data': rf_raw[rf_level], 'timestamp' : r30.timestamp()}));
 
+                r30.func.func_set_msg(false, 'RF Gain was set to '+rf_level+' for band '+ ((r30.value.main_band == r30.const.BAND_A) ? 'A' : 'B'));
+
                 return true;
             },
-            set_squelch_level           : function (squelch_level = null) {
+            set_squelch_level           : function (squelch_level = null, squelch_label = null) {
                 let squelch_raw = {
                     0 :  ['0x00','0x00'],
                     1 :  ['0x00','0x24'],
@@ -1802,6 +1999,8 @@ $(function () {
                 };
 
                 queue.add(JSON.stringify({'cmd':['0x14'], 'subcmd': '0x03', 'data': squelch_raw[squelch_level], 'timestamp' : r30.timestamp()}));
+
+                r30.func.func_set_msg(false, 'Squelch was set to '+squelch_label[squelch_level]+' for band '+ ((r30.value.main_band == r30.const.BAND_A) ? 'A' : 'B'));
 
                 return true;
             },
@@ -1826,8 +2025,80 @@ $(function () {
 
                 return true;
             },
+            set_receive_mode            : function (receive_mode = null) {
+                if (receive_mode !== null) {
+                    switch (true) {
+                        case (receive_mode == r30.const.RECEIVE_MODE.LSB) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x00','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [LSB] set.');
+                        break; // LSB
+                        case (receive_mode == r30.const.RECEIVE_MODE.USB) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x01','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [USB] set.');
+                        break; // USB
+                        case (receive_mode == r30.const.RECEIVE_MODE.AM) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x02','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [AM] set.');
+                            break; // AM
+                        case (receive_mode == r30.const.RECEIVE_MODE.AM_N) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x02','0x02'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [AM-N] set.');
+                            break; // AM-N
+                        case (receive_mode == r30.const.RECEIVE_MODE.CW) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x03','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [CW] set.');
+                            break; // CW
+                        case (receive_mode == r30.const.RECEIVE_MODE.FM) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x05','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [FM] set.');
+                            break; // FM
+                        case (receive_mode == r30.const.RECEIVE_MODE.FM_N) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x05','0x02'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [FM-N] set.');
+                            break; // FM-N
+                        case (receive_mode == r30.const.RECEIVE_MODE.WFM) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x06','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [WFM] set.');
+                            break; // WFM
+                        case (receive_mode == r30.const.RECEIVE_MODE.CW_R) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x07','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [CW-R] set.');
+                            break; // CW-R
+                        case (receive_mode == r30.const.RECEIVE_MODE.P25) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x16','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [P25] set.');
+                            break; // P25
+                        case (receive_mode == r30.const.RECEIVE_MODE.D_STAR) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x17','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [D-STAR] set.');
+                            break; // D-STAR
+                        case (receive_mode == r30.const.RECEIVE_MODE.DPMR) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x18','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [dPMR] set.');
+                            break; // dPMR
+                        case (receive_mode == r30.const.RECEIVE_MODE.NXDN_VN) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x19','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [NXDN-VN] set.');
+                            break; // NXDN-VN
+                        case (receive_mode == r30.const.RECEIVE_MODE.NXDN_N) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x20','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [NXDN-N] set.');
+                            break; // NXDN-N
+                        case (receive_mode == r30.const.RECEIVE_MODE.DCR) :
+                            queue.add(JSON.stringify({'cmd':['0x06'], 'subcmd': null, 'data': ['0x21','0x01'], 'timestamp' : r30.timestamp()}));
+                            r30.func.func_set_msg(false, 'Receive Mode [DCR] set.');
+                            break; // DCR
+                    }
+
+                }
+
+                return true;
+            },
             set_tuning_step             : function (tuning_step = null) {
-                queue.add(JSON.stringify({'cmd':['0x10'], 'subcmd': null, 'data': ['0x' + tuning_step], 'timestamp' : r30.timestamp()}));
+                if (tuning_step !== null) {
+                    queue.add(JSON.stringify({'cmd':['0x10'], 'subcmd': null, 'data': ['0x' + tuning_step], 'timestamp' : r30.timestamp()}));
+
+                }
 
                 return true;
             },
@@ -1854,6 +2125,29 @@ $(function () {
                             queue.add(JSON.stringify({'cmd':['0x11'], 'subcmd': null, 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
                         break;
                     }
+                }
+
+                return true;
+            },
+            set_vsc                     : function () {
+                if (
+                    (r30.band[r30.value.main_band].receive_mode == r30.const.RECEIVE_MODE.FM) ||
+                    (r30.band[r30.value.main_band].receive_mode == r30.const.RECEIVE_MODE.FM_N) ||
+                    (r30.band[r30.value.main_band].receive_mode == r30.const.RECEIVE_MODE.WFM) ||
+                    (r30.band[r30.value.main_band].receive_mode == r30.const.RECEIVE_MODE.AM) ||
+                    (r30.band[r30.value.main_band].receive_mode == r30.const.RECEIVE_MODE.AM_N)
+                ) {
+                    if (r30.band[r30.value.main_band].vsc == r30.const.VSC.OFF) {
+                        queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': ['0x4C'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
+
+                        r30.func.func_set_msg(false, 'VSC [ON] initiated.');
+                    } else {
+                        queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': ['0x4C'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
+
+                        r30.func.func_set_msg(false, 'VSC [OFF] initiated.');
+                    }
+                } else {
+                    r30.func.func_set_msg(true, 'VSC only for [FM, FM-N, WFM, AM and AM-N].');
                 }
 
                 return true;
@@ -1889,15 +2183,15 @@ $(function () {
                         if (r30.band[r30.value.main_band].anl == 0) {
                             r30.band[r30.value.main_band].anl = 1;
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x00'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
-                            r30.func.func_set_msg(false, 'Automatic Noise Limiter [ANL] enabled.')
+                            r30.func.func_set_msg(false, 'Automatic Noise Limiter [ANL] enabled.');
                         } else {
                             r30.band[r30.value.main_band].anl = 0;
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x00'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
-                            r30.func.func_set_msg(false, 'Automatic Noise Limiter [ANL] disabled.')
+                            r30.func.func_set_msg(false, 'Automatic Noise Limiter [ANL] disabled.');
                         }
                     }
                 } else {
-                    r30.func.func_set_msg(true, 'Automatic Noise Limiter [ANL] only in AM usable.')
+                    r30.func.func_set_msg(true, 'Automatic Noise Limiter [ANL] only in AM usable.');
                 }
 
                 return true;
@@ -1944,9 +2238,13 @@ $(function () {
                 if (pskip == false) {
                     // Send Temporary Skip
                     queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x08'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
+
+                    r30.func.func_set_msg(false, 'T-SKIP was set.');
                 } else {
                     // Send Permanent Skip
                     queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x08'], 'data': ['0x02'], 'timestamp' : r30.timestamp()}));
+
+                    r30.func.func_set_msg(false, 'P-SKIP was set.');
                 }
 
                 return true;
@@ -1957,25 +2255,25 @@ $(function () {
                         r30.band[band].operation_mode = operation_mode;
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x0'+operation_mode], 'timestamp' : r30.timestamp()}));
                     } else {
-                        if (r30.band[band].operation_mode == 0) {
+                        if (r30.band[band].operation_mode == r30.const.OPERATION_MODE.VFO) {
                             // Switch from VFO to Memory Mode
-                            r30.band[band].operation_mode = 1;
+                            r30.band[band].operation_mode = r30.const.OPERATION_MODE.MEM;
 
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
 
                             return true;
                         }
 
-                        if (r30.band[band].operation_mode == 1) {
+                        if (r30.band[band].operation_mode == r30.const.OPERATION_MODE.MEM) {
                             // Switch to Memory to WX or VFO
                             if (r30.value.usa == true) {
-                                r30.band[band].operation_mode = 2;
+                                r30.band[band].operation_mode = r30.const.OPERATION_MODE.WX;
 
                                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x02'], 'timestamp' : r30.timestamp()}));
 
                                 return true;
                             } else {
-                                r30.band[band].operation_mode = 0;
+                                r30.band[band].operation_mode = r30.const.OPERATION_MODE.VFO;
 
                                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
 
@@ -1983,9 +2281,9 @@ $(function () {
                             }
                         }
 
-                        if (r30.band[band].operation_mode == 2) {
+                        if (r30.band[band].operation_mode == r30.const.OPERATION_MODE.WX) {
                             // Switch to WX to VFO
-                            r30.band[band].operation_mode = 0;
+                            r30.band[band].operation_mode = r30.const.OPERATION_MODE.VFO;
 
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
 
@@ -2000,24 +2298,24 @@ $(function () {
 
                         return true;
                     } else {
-                        if (r30.band[r30.value.main_band].operation_mode == 0) {
+                        if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.VFO) {
                             // Switch from VFO to Memory Mode
-                            r30.band[r30.value.main_band].operation_mode = 1;
+                            r30.band[r30.value.main_band].operation_mode = r30.const.OPERATION_MODE.MEM;
 
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
 
                             return true;
                         }
 
-                        if (r30.band[r30.value.main_band].operation_mode == 1) {
+                        if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.MEM) {
                             // Switch from Memory to WX or VFO
                             if (r30.value.usa == true) {
-                                r30.band[r30.value.main_band].operation_mode = 2;
+                                r30.band[r30.value.main_band].operation_mode = r30.const.OPERATION_MODE.WX;
 
                                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x02'], 'timestamp' : r30.timestamp()}));
 
                             } else {
-                                r30.band[r30.value.main_band].operation_mode = 0;
+                                r30.band[r30.value.main_band].operation_mode = r30.const.OPERATION_MODE.VFO;
 
                                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
                             }
@@ -2025,9 +2323,9 @@ $(function () {
                             return true;
                         }
 
-                        if (r30.band[r30.value.main_band].operation_mode == 2) {
+                        if (r30.band[r30.value.main_band].operation_mode == r30.const.OPERATION_MODE.WX) {
                             // Switch to WX to VFO
-                            r30.band[r30.value.main_band].operation_mode = 0;
+                            r30.band[r30.value.main_band].operation_mode = r30.const.OPERATION_MODE.VFO;
 
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
 
@@ -2038,10 +2336,22 @@ $(function () {
 
                 return true;
             },
+            set_audio_level_synchronize : function () {
+                if (r30.value.audio_mode == 0) {
+                    r30.func.func_set_msg(false, 'Audio level separate.');
+                    queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x06', 'data': '0x01', 'timestamp' : r30.timestamp()}));
+                } else {
+                    r30.func.func_set_msg(false, 'Audio level synchronized.');
+                    queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x06', 'data': '0x00', 'timestamp' : r30.timestamp()}));
+                }
+
+                return true;
+            },
 
             // ##########################
             // # Read Commands
             // ##########################
+
             get_receiver_id             : function () {
                 queue.add(JSON.stringify({'cmd':['0x19'], 'subcmd': ['0x00'], 'data': null, 'timestamp' : r30.timestamp()}));
 
@@ -2049,45 +2359,83 @@ $(function () {
             },
             get_display_content         : function (init = false, band = null) {
                 if (init == false) {
-                    if (r30.value.dual_band == true) {
-                        if (r30.band[0].scan == true) {
-                            queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-                        }
-
-                        queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-
-                        if (r30.band[1].scan == true) {
-                            queue.add(JSON.stringify({'cmd': ['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp': r30.timestamp()}));
-                        }
-
-                        queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                    } else {
-                        if (r30.value.main_band !== null) {
-                            if (r30.value.main_band == 0) {
-
+                    if (band == null) {
+                        if (r30.value.dual_band == true) {
+                            if (r30.band[r30.const.BAND_A].scan == true) {
                                 queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                            } else {
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
                             }
-                        } else {
-                            queue.add(JSON.stringify({'cmd':['0x1A', '0x11'], 'subcmd': null, 'data': null, 'timestamp' : r30.timestamp()}));
-                        }
 
+                            queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+
+                            if (r30.band[r30.const.BAND_B].scan == true) {
+                                queue.add(JSON.stringify({'cmd': ['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp': r30.timestamp()}));
+                            }
+
+                            queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                        } else {
+                            if (r30.value.main_band !== null) {
+                                if (r30.value.main_band == r30.const.BAND_A) {
+
+                                    queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                                    queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                                } else {
+
+                                    queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                                    queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                                }
+                            } else {
+                                queue.add(JSON.stringify({'cmd':['0x1A', '0x11'], 'subcmd': null, 'data': null, 'timestamp' : r30.timestamp()}));
+                            }
+                        }
+                    } else {
+                        if (r30.value.dual_band == true) {
+                            if (r30.band[r30.const.BAND_A].scan == true) {
+                                queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
+                            }
+
+                            queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+
+                            if (r30.band[r30.const.BAND_B].scan == true) {
+                                queue.add(JSON.stringify({'cmd': ['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp': r30.timestamp()}));
+                            }
+
+                            queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                        } else {
+                            if (r30.value.main_band !== null) {
+                                if (r30.value.main_band == r30.const.BAND_A) {
+
+                                    queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                                    queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                                } else {
+
+                                    queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                                    queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+                                }
+                            } else {
+                                queue.add(JSON.stringify({'cmd':['0x1A', '0x11'], 'subcmd': null, 'data': null, 'timestamp' : r30.timestamp()}));
+                            }
+                        }
                     }
                 } else {
+                    if (band == null) {
+                        queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
 
-                    queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                    queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
+                        queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
+                    } else {
+                        queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
+                    }
 
                 }
 
@@ -2163,6 +2511,11 @@ $(function () {
 
                 return true;
             },
+            get_audio_level_synchronize : function () {
+                queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x06', 'data': null, 'timestamp' : r30.timestamp()}));
+
+                return true;
+            },
             get_anl                     : function () {
                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x00', 'data': null, 'timestamp' : r30.timestamp()}));
 
@@ -2209,10 +2562,12 @@ $(function () {
         },
         sched       :  {
             0 : function () {
-                r30.cmd.get_display_content(false,0);
+                r30.cmd.get_display_content(false, r30.const.BAND_A);
+                //console.log("Scheduler Band A");
             },
             1 : function () {
-                r30.cmd.get_display_content(false,1);
+                r30.cmd.get_display_content(false, r30.const.BAND_B);
+                //console.log("Scheduler Band B");
             }
             //r30.cmd.get_scan_condition();
             //r30.cmd.get_s_meter();
@@ -2227,7 +2582,6 @@ $(function () {
             //r30.cmd.get_tuning_step();
             /** Fixed **/
 
-
             // TODO : Scheduler Stop for each bank
 
             /** Test **/
@@ -2240,6 +2594,7 @@ $(function () {
                 r30.cmd.get_af_gain_level();
                 r30.cmd.get_rf_gain_level();
                 r30.cmd.get_squelch_level();
+                r30.cmd.get_audio_level_synchronize();
                 r30.cmd.get_scan_condition();
                 r30.cmd.get_display_type();
                 r30.cmd.get_display_content(true);
@@ -2247,6 +2602,8 @@ $(function () {
                 r30.cmd.get_memory_group_name();
 
                 /** Test **/
+
+
 
                 //r30.cmd.get_noise_blanker_status();
                 //r30.cmd.set_noise_blanker_status(0);

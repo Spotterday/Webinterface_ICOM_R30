@@ -171,7 +171,7 @@ module.exports = {
         }
     },
     _get_dsql                   : function (data = null) {
-        // TODO : _get_dsql
+        // TODO : functions.js func._get_dsql
     },
     _get_rec                    : function (data = null) {
         if (data !== null) {
@@ -183,7 +183,7 @@ module.exports = {
         }
     },
     _get_wx                     : function (data = null) {
-        // TODO : _get_wx
+        // TODO : functions.js func._get_wx
     },
     _get_dtcs                   : function (data = null) {
         if (data !== null) {
@@ -207,7 +207,7 @@ module.exports = {
             }
         }
     },
-    _get_skip                   : function (data = null) {
+    _get_skip_mode                   : function (data = null) {
         if (data !== null) {
             if (data == "00") {
                 return 0;
@@ -321,6 +321,9 @@ module.exports = {
             }
         }
     },
+    _get_scan_type              : function (data = null) {
+        // TODO : functions.js func._get_scan_type
+    },
     _get_scan_condition         : function (data = null) {
         if (data !== null && (typeof data[1] !== "undefined" && data[1] !== "" && data[2] !== "")) {
             return JSON.stringify({
@@ -390,21 +393,25 @@ module.exports = {
             switch (true) {
                 case (data[0] == "00" &&  data[1] == "01"): return 1;                                       //  "LSB"
                 case (data[0] == "01" &&  data[1] == "01"): return 2;                                       //  "USB"
-                case (data[0] == "02" &&  data[1] == "01"): return 3;                                       //  "AM"
-                case (data[0] == "02" &&  (typeof data[1] == 'undefined' || data[1] == null)): return 4;    // "AM"
-                case (data[0] == "02" &&  data[1] == "02"): return 5;                                       //  "AM-N"
-                case (data[0] == "03" &&  data[1] == "01"): return 6;                                       //  "CW"
-                case (data[0] == "05" &&  data[1] == "01"): return 7;                                       //  "FM"
-                case (data[0] == "05" &&  (typeof data[1] == 'undefined' || data[1] == null)): return 8;    // "FM"
-                case (data[0] == "05" &&  data[1] == "02"): return 9;                                       //  "FM-N"
-                case (data[0] == "06" &&  data[1] == "01"): return 10;                                      //  "WFM"
-                case (data[0] == "07" &&  data[1] == "01"): return 11;                                      //  "CW-R"
-                case (data[0] == "16" &&  data[1] == "01"): return 12;                                      //  "P25"
-                case (data[0] == "17" &&  data[1] == "01"): return 13;                                      //  "D-STAR"
-                case (data[0] == "18" &&  data[1] == "01"): return 14;                                      //  "dPMR"
-                case (data[0] == "19" &&  data[1] == "01"): return 15;                                      //  "NXDN-VN"
-                case (data[0] == "20" &&  data[1] == "01"): return 16;                                      //  "NXDN-N"
-                case (data[0] == "21" &&  data[1] == "01"): return 17;                                      //  "DCR"
+                case (
+                    (data[0] == "02" &&  data[1] == "01") ||
+                    (data[0] == "02" &&  (typeof data[1] == 'undefined' || data[1] == null))
+                ):                                          return 3;                                       //  "AM"
+                case (data[0] == "02" &&  data[1] == "02"): return 4;                                       //  "AM-N"
+                case (data[0] == "03" &&  data[1] == "01"): return 5;                                       //  "CW"
+                case (
+                    (data[0] == "05" &&  data[1] == "01") ||
+                    (data[0] == "05" &&  (typeof data[1] == 'undefined' || data[1] == null))
+                ) :                                         return 6;                                       //  "FM"
+                case (data[0] == "05" &&  data[1] == "02"): return 7;                                       //  "FM-N"
+                case (data[0] == "06" &&  data[1] == "01"): return 8;                                       //  "WFM"
+                case (data[0] == "07" &&  data[1] == "01"): return 9;                                       //  "CW-R"
+                case (data[0] == "16" &&  data[1] == "01"): return 10;                                      //  "P25"
+                case (data[0] == "17" &&  data[1] == "01"): return 11;                                      //  "D-STAR"
+                case (data[0] == "18" &&  data[1] == "01"): return 12;                                      //  "dPMR"
+                case (data[0] == "19" &&  data[1] == "01"): return 13;                                      //  "NXDN-VN"
+                case (data[0] == "20" &&  data[1] == "01"): return 14;                                      //  "NXDN-N"
+                case (data[0] == "21" &&  data[1] == "01"): return 15;                                      //  "DCR"
                 default:
                     return "Unknown";
 
@@ -454,7 +461,7 @@ module.exports = {
                 "wx"             : this._get_wx(data[14]),
                 "rec"            : this._get_rec(data[15]),
                 "afc"            : this._get_afc(data[16]),
-                "skip"           : this._get_skip(data[17]),
+                "skip_mode"      : this._get_skip_mode(data[17]),
                 "mem_group_nr"   : data[18]+data[19],
                 "mem_channel_nr" : data[20]+data[21],
                 "mem_name"       : this.hexToString(data[22]+data[23]+data[24]+data[25]+data[26]+data[27]+data[28]+data[29]+data[30]+data[31]+data[32]+data[33]+data[34]+data[35]+data[36]+data[37]),
@@ -462,13 +469,13 @@ module.exports = {
                 "tsql"           : (freq_mode == 7 || freq_mode == 8 || freq_mode == 9)      ?   this._get_tsql(data[39])                    : null,
                 "anl"            : (freq_mode == 3 || freq_mode == 4 || freq_mode == 5)      ?   this._get_anl(data[39])                     : null, // TODO : must be checked because of different modes
                 "nb"             : (freq_mode == 1 || freq_mode == 6 || freq_mode == 11)     ?   this._get_noise_blanker_status(data[39])    : null,
-                "dsql"           : (freq_mode == 13)                                         ?   this._get_dsql(data[39]) : null,                                     // TODO : open dsql
+                "dsql"           : (freq_mode == 13)                                         ?   this._get_dsql(data[39]) : null,
                 "dtcs"           : (freq_mode == 7 || freq_mode == 8)                        ?   this._get_dtcs(data[39]) : null,
             });
         }
     },
     _get_memory_group_name      : function (data = null) {
-        // TODO : _get_memory_group_name not finished
+        // TODO : functions.js func._get_memory_group_name
     },
     _get_noise_blanker_status   : function (data = null) {
         if (data !== null) {

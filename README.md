@@ -167,7 +167,7 @@ pi@R30:~ $ rm -f default.json
 
 A list of packages can be find in [package.json](package.json) under section **dependencies**.
 
-! On Unix put package **"node-bluetooth-serial-port": "tinyprinter/node-bluetooth-serial-port#master"** from package.json to optionalDependencies. It is only required on windows.
+:warning: On Unix put package **"node-bluetooth-serial-port": "tinyprinter/node-bluetooth-serial-port#master"** from package.json to optionalDependencies. It is only required on windows.
 
 ```	
 pi@R30:~/Webinterface_ICOM_R30-main $ npm install

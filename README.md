@@ -139,6 +139,7 @@ Changing XX:XX:XX:XX:XX:XX trust succeeded
 [bluetooth]# exit
 	
 ```
+
 Fallback is - you can do it via Desktop ;) 
 
 ![Linux 1](https://github.com/Spotterday/Webinterface_ICOM_R30/blob/main/doc/img/linux1.png)

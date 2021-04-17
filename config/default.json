@@ -20,7 +20,7 @@
     "usa"   : false,
     "hwmac" : "XX:XX:XX:XX:XX:XX",
     "serial": {
-      "baudrate"  : 9600,
+      "baudrate"  : 19200,
       "databits"  : 7,
       "autoopen"  : true,
       "stopbits"  : 1,

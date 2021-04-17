@@ -287,14 +287,7 @@ e.g: http://192.168.10.2:3000
 
 ## Known Issues
 
-- [ ] IC-R30 Settings not working
-- [ ] IC-R30 Bank frequencies listing not working
-- [ ] Receive audio via Bluetooth not working
-- [x] [Receive audio via Bluetooth - Workaround with VLC](https://github.com/Spotterday/Webinterface_ICOM_R30#workaround-audio-with-vlc)
-- [ ] Receive Log in sqlite database not working
-- [X] IC-R30 Bank name listing
-- [X] IC-R30 WX Mode not supported - i have no USA device
-- [X] Command queue fills up when website is not in focus - It is a protection from Chrome and Firefox, that socket request can be made only every 1 second - but we push every 100ms a new command
+Please take a view at : https://github.com/Spotterday/Webinterface_ICOM_R30/issues
 
 ### Workaround Audio with VLC
 

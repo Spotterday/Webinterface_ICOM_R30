@@ -17,8 +17,8 @@ Guys I know a lot of stuff on Github is free. But I would appreciate a small cof
 ## Hardware requirements
 
 ### USB Bluetooth Dongle
-Based on the following document [RS-R30-Brochure](doc/RS-R30-Brochure.pdf), you will need a USB dongle which supports SPP (CI-V command）.
-A possible USB dongel which works under Linux and Windows is this : [USB Dongle](https://amzn.to/3o0EV8l) (*Affiliate  Link*)
+Based on the following document [RS-R30-Brochure](doc/RS-R30-Brochure.pdf), you will need a USB Bluetooth Dongle which supports SPP (CI-V command）.
+A possible USB Bluetooth Dongle which works under Linux and Windows is this : [USB Bluetooth Dongle](https://amzn.to/3o0EV8l) (*Affiliate  Link*)
 Bluetooth Profile : A2DP, ATT, AVRCP, GAVDP, GATT, HCRP, HFP, HID, HID over GATT, OPP, PAN, SPP
 
 ### USB Audio Card

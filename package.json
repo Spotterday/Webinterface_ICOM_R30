@@ -1,18 +1,20 @@
 {
-  "name": "IC-R30",
-  "version": "1.0.0",
-  "description": "Remote Control for ICOM IC-R30",
+  "name": "ic-r30",
+  "version": "1.4.8",
+  "description": "Remote Control for Icom IC-R30",
   "homepage": "https://www.spotterday.de",
-  "main": "client.js",
+  "main": "server.js",
   "os": [
     "win32",
     "linux"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./server.js"
   },
-  "bin": "./client.js",
-  "keywords": [],
+  "bin": {
+    "ic-r30": "server.js"
+  },
   "author": "Christian Pusch [https://www.spotterday.de]",
   "license": "ISC",
   "engineStrict": true,
@@ -21,28 +23,39 @@
     "node": ">=14"
   },
   "pkg": {
-    "scripts": "client.js"
+    "assets": [
+      "server.js",
+      "client.js",
+      "/db/*",
+      "/js/*",
+      "node_modules/**/*",
+      "public/**/*"
+    ],
+    "targets": [
+      "node14-linux-x64",
+      "node14-win-x64",
+      "node14-linux-arm64"
+    ],
+    "outputPath": "build"
   },
+  "keywords": [
+    "icr30",
+    "icom",
+    "ic-r30"
+  ],
   "dependencies": {
-    "bluetooth-classic-serialport-client": "latest",
-    "buffer": "latest",
-    "express": "latest",
-    "http": "latest",
-    "fs": "latest",
-    "sqlite3": "latest",
-    "mysql2": "latest",
-    "os": "latest",
-    "config": "latest",
-    "audio-speaker": "latest",
-    "response.js": "^0.10.1",
-    "serialport": "latest",
-    "node-bluetooth-serial-port": "tinyprinter/node-bluetooth-serial-port#master",
-    "socket.io": "latest",
-    "chalk": "latest",
-    "jquery-mousewheel": "latest",
-    "alsa-capture": "latest"
+    "bluetooth-classic-serialport-client": "0.1.25",
+    "buffer": "6.0.3",
+    "chalk": "4.1.0",
+    "config": "3.3.6",
+    "express": "4.17.1",
+    "jquery-mousewheel": "3.1.13",
+    "os": "0.1.1",
+    "serialport": "9.0.7",
+    "socket.io": "4.0.1",
+    "sqlite3": "5.0.2"
   },
-  "optionalDependencies": {
-
+  "devDependencies": {
+    "pkg": "^5.0.0"
   }
 }

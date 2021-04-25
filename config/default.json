@@ -1,11 +1,14 @@
 {
   "version" : {
-    "web" : "1.4.4",
-    "server" : "1.4.7"
+    "web" : "1.4.8",
+    "server" : "1.4.8"
   },
   "server"  : {
     "audio" : {
-      "src" : "http://{PI-IP}:8888/air.mp3"
+      "host": "",
+      "port": "",
+      "file": "",
+      "src" : "http://192.168.10.9:8888/air.mp3"
     },
     "http": {
       "host": "0.0.0.0",
@@ -18,7 +21,7 @@
   },
   "scanner" : {
     "usa"   : false,
-    "hwmac" : "XX:XX:XX:XX:XX:XX",
+    "hwmac" : "00:0B:E4:08:58:91",
     "serial": {
       "baudrate"  : 19200,
       "databits"  : 7,
@@ -35,7 +38,7 @@
   },
   "remote"  : {
     "connect"   : false,
-    "host"      : "",
+    "host"      : "example.de",
     "port"      : 6000,
     "username"  : "",
     "key"       : "",

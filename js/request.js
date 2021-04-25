@@ -5,14 +5,14 @@
 
 module.exports = {
 
-    serial      : null,
-    bluetooth   : null,
-    status_serial : false,
-    status_bluetooth: false,
-    status_socket: false,
+    status_serial :     false,
+    status_bluetooth:   false,
+    status_socket:      false,
 
-    init    : function (cmd = null, subcmd = null, data = null) {
+    init    : function (cmd = null, subcmd = null, data = null, serial = null) {
         const color = require('chalk');
+        const os    = require('os');
+
         var array = [];
 
         switch(true) {
@@ -43,7 +43,7 @@ module.exports = {
                     array.push(cmd);
                 }
 
-                if (Array.isArray(data)) {
+                if (data !== null && Array.isArray(data) && data.length > 0) {
                     data.forEach(function (element) {
                         array.push(element);
                     });
@@ -93,7 +93,7 @@ module.exports = {
                     array.push(subcmd);
                 }
 
-                if (Array.isArray(data)) {
+                if (data !== null && Array.isArray(data) && data.length > 0) {
                     data.forEach(function (element) {
                         array.push(element);
                     });
@@ -109,10 +109,28 @@ module.exports = {
         }
 
         // array = ['0xFE', '0xFE', '0x9C', '0xE0', '0x1A', '0x0F', '0x00', '0x00', '0x16', '0x00', '0x17', '0x00', '0x18', '0x00', '0x19', '0x00', '0x20', '0x00', '0x21', '0x00', '0x22', '0x00', '0x21', '0x00', '0x22', '0x00', '0x23', '0x00', '0x24', '0x00', '0x25', '0x00', '0x26', '0x00', '0x27', '0x00', '0x28','0xFD'];
-        if (this.bluetooth) {
-            this.serial.write(Buffer.from(array)).then(() => console.log(color.cyanBright('[SERI] ') + array + ' successfully')).catch((err) => console.log('Error', err));
-        } else {
-            console.error(color.redBright('[CMD] ') + cmd +' - '+ subcmd +' - '+ data + ' failed');
-        }
+        //if (this.status_bluetooth) {
+            if (os.platform() === 'linux') {
+                serial.write(Buffer.from(array)).then(() => console.log(color.cyanBright('[SEND] ') + array)).catch((err) => console.log(color.redBright('[SEND] '+ err)));
+            } else {
+                try {
+                    serial.write(Buffer.from(array), function(err) {
+                        if (err) {
+                            console.log(color.redBright('[SEND] '+ err.message));
+                        }
+
+                        console.log(color.cyanBright('[SEND] ') + array);
+                    });
+                } catch (e) {
+                    console.log(color.redBright('[SEND] ' + e.message + ' - Please check your serial connection.'));
+
+                    this.status_serial = false;
+                    this.status_bluetooth = false;
+                }
+
+            }
+        //} else {
+        //    console.error(color.redBright('[CMD] ') + cmd +' - '+ subcmd +' - '+ data);
+        //}
     },
 };

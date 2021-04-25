@@ -22,11 +22,35 @@ module.exports = {
 
         return arr;
     },
+    extMultiMode : function (response = null) {
+        var buff_hex = response.toString('hex');
+        var buff_hex_array = buff_hex.match(/.{1,2}/g);
+
+        return typeof buff_hex_array[4] !== 'undefined' && buff_hex_array[4].toUpperCase() == "29";
+    },
+    extBand     : function (response = null) {
+        var buff_hex = response.toString('hex');
+        var buff_hex_array = buff_hex.match(/.{1,2}/g);
+
+        if (typeof buff_hex_array[4] !== 'undefined' && buff_hex_array[4].toUpperCase() == "29") {
+            return buff_hex_array[5].toUpperCase();
+        } else {
+            return null;
+        }
+    },
     extCmd      : function (response = null) {
         var buff_hex = response.toString('hex');
         var buff_hex_array = buff_hex.match(/.{1,2}/g);
 
-        return buff_hex_array[4].toUpperCase();
+        if (typeof buff_hex_array[0] !== 'undefined' && buff_hex_array[0].toUpperCase() == "FE") {
+            if (typeof buff_hex_array[4] !== 'undefined' && buff_hex_array[4].toUpperCase() == "29") {
+                return buff_hex_array[6].toUpperCase();
+            } else {
+                return buff_hex_array[4].toUpperCase();
+            }
+        } else {
+            return null;
+        }
     },
     extSubCmd   : function (cmd, response= null) {
         if (this.nosubcmd.indexOf(cmd) === -1) {
@@ -36,7 +60,16 @@ module.exports = {
             var buff_hex = response.toString('hex');
             var buff_hex_array = buff_hex.match(/.{1,2}/g);
 
-            return buff_hex_array[5].toUpperCase();
+            if (typeof buff_hex_array[0] !== 'undefined' && buff_hex_array[0].toUpperCase() == "FE") {
+                if (typeof buff_hex_array[4] !== 'undefined' && buff_hex_array[4].toUpperCase() == "29") {
+                    return buff_hex_array[7].toUpperCase();
+                } else {
+                    return buff_hex_array[5].toUpperCase();
+                }
+            } else {
+                return null;
+            }
+
         } else {
             // ##########################
             // # Has no subcmd
@@ -56,20 +89,40 @@ module.exports = {
             // # Has Sub Command
             // ##########################
 
-            buff_hex_array.forEach(function(element) {
-                if (i > 6 && i < response.length) {
-                    data_array.push(element.toUpperCase());
-                }
-                i++;
-            });
+            if (typeof buff_hex_array[4] !== 'undefined' && buff_hex_array[4].toUpperCase() == "29") {
+                buff_hex_array.forEach(function(element) {
+                    if (i > 8 && i < response.length) {
+                        data_array.push(element.toUpperCase());
+                    }
+                    i++;
+                });
+            } else {
+                buff_hex_array.forEach(function(element) {
+                    if (i > 6 && i < response.length) {
+                        data_array.push(element.toUpperCase());
+                    }
+                    i++;
+                });
+            }
+
 
         } else {
-            buff_hex_array.forEach(function(element) {
-                if (i > 5 && i < response.length) {
-                    data_array.push(element.toUpperCase());
-                }
-                i++;
-            });
+            if (typeof buff_hex_array[4] !== 'undefined' && buff_hex_array[4].toUpperCase() == "29") {
+                buff_hex_array.forEach(function(element) {
+                    if (i > 6 && i < response.length) {
+                        data_array.push(element.toUpperCase());
+                    }
+                    i++;
+                });
+            } else {
+                buff_hex_array.forEach(function(element) {
+                    if (i > 5 && i < response.length) {
+                        data_array.push(element.toUpperCase());
+                    }
+                    i++;
+                });
+            }
+
 
         }
 
@@ -90,9 +143,11 @@ module.exports = {
 
         return data_array;
     },
-    hexToString : function (str) {
-        const buf = new Buffer.from(str, 'hex');
-        return buf.toString('utf8').trim();
+    hexToString : function (str = null) {
+        if (str !== null) {
+            const buf = new Buffer.from(str, 'hex');
+            return buf.toString('utf8').trim();
+        }
     },
     _get_band                   : function (data = null) {
         if (data !== null) {
@@ -173,6 +228,14 @@ module.exports = {
     _get_dsql                   : function (data = null) {
         // TODO : functions.js func._get_dsql
     },
+    _get_display_type           : function (data = null) {
+        if (data !== null) {
+            switch (true) {
+                case (data == '00') : return 0;
+                case (data == '01') : return 1;
+            }
+        }
+    },
     _get_rec                    : function (data = null) {
         if (data !== null) {
             switch (true) {
@@ -207,7 +270,7 @@ module.exports = {
             }
         }
     },
-    _get_skip_mode                   : function (data = null) {
+    _get_skip_mode              : function (data = null) {
         if (data !== null) {
             if (data == "00") {
                 return 0;
@@ -328,11 +391,11 @@ module.exports = {
         if (data !== null && (typeof data[1] !== "undefined" && data[1] !== "" && data[2] !== "")) {
             return JSON.stringify({
                 0: {
-                    scan             : (data[1] == "01" || data[1] == "02" || data[1] == "03" || data[1] == "04") ? true : false,
+                    scan             : (data[1] == "01" || data[1] == "02" || data[1] == "03" || data[1] == "04"),
                     scan_direction   : (data[1] == "01" || data[1] == "03") ? 'up' : 'down',
                 },
                 1: {
-                    scan             : (data[2] == "01" || data[2] == "02" || data[2] == "03" || data[2] == "04") ? true : false,
+                    scan             : (data[2] == "01" || data[2] == "02" || data[2] == "03" || data[2] == "04"),
                     scan_direction   : (data[2] == "01" || data[2] == "03") ? 'up' : 'down',
                 }
             });

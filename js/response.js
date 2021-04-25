@@ -2,9 +2,6 @@
 // # Response Handler
 // ##########################
 module.exports = {
-    serial      : null,
-    bluetooth   : null,
-
     responsetimestamp : function () {
         let date_ob = new Date();
         let date = ("0" + date_ob.getDate()).slice(-2);
@@ -15,9 +12,8 @@ module.exports = {
         let seconds = date_ob.getSeconds();
         return year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
     },
-    init : function (cmd = null, subcmd = null, cmddata) {
+    init : function (multimode = false, cmd = null, subcmd = null, cmddata, banddata = null) {
         const func = require('./functions.js');
-
         let resultdata = null, band = null, raw = null;
 
         raw = cmddata;
@@ -37,9 +33,7 @@ module.exports = {
                     resultdata = null;
                 }
             break;
-            case (cmd == "0C") :
-                resultdata = func._get_scan_type(cmddata[0]);
-            break;
+
             case (cmd == "0F") :
                 resultdata = func._get_dup(cmddata[0]);
             break;
@@ -73,17 +67,29 @@ module.exports = {
                         break;
                     case (subcmd == "09"):
                         // Here nothing should came -1A 09 is only an execute command
-                       break;
                     break;
                     case (subcmd == "11") :
                         // Display Content
-                        resultdata = func._get_display_content(null, cmddata);
+                        if (multimode == false) {
+                            resultdata = func._get_display_content(null, cmddata);
+                        } else {
+                            band = func._get_band(banddata);
+                            resultdata = func._get_display_content(band, cmddata);
+                        }
                     break;
                     case (subcmd == "12") :
-                        resultdata = JSON.stringify({
-                            'squelch_status'    : func._get_squelch_status(cmddata[0]),
-                            's_meter_lvl'       : func._get_s_meter_lvl([cmddata[1], cmddata[2]])
-                        });
+                        if (multimode == false) {
+                            resultdata = JSON.stringify({
+                                'squelch_status'    : func._get_squelch_status(cmddata[0]),
+                                's_meter_lvl'       : func._get_s_meter_lvl([cmddata[1], cmddata[2]])
+                            });
+                        } else {
+                            resultdata = JSON.stringify({
+                                'band'              : (banddata == "00") ? 0 : 1,
+                                'squelch_status'    : func._get_squelch_status(cmddata[0]),
+                                's_meter_lvl'       : func._get_s_meter_lvl([cmddata[1], cmddata[2]])
+                            });
+                        }
                     break;
                     case (subcmd == "0F") :
                         resultdata = cmddata;
@@ -95,6 +101,9 @@ module.exports = {
                             break;
                         }
                     break;
+                    case (cmd == "0C") :
+                        resultdata = func._get_scan_type(cmddata[0]);
+                        break;
                 }
             break;
             case (cmd == "10") :
@@ -159,43 +168,32 @@ module.exports = {
             break;
             case (cmd == "16") :
                 switch (true) {
-                    case (subcmd == "4C"):
-                        resultdata = func._get_vsc(cmddata[0]);
-                        break;
                     case (subcmd == "22"):
                         resultdata = func._get_noise_blanker_status(cmddata[0]);
                         break;
+                    case (subcmd == "43"):
+                        resultdata = func._get_tsql(cmddata[0]);
+                        break;
+                    case (subcmd == "4A"):
+                        resultdata = func._get_afc(cmddata[0]);
+                        break;
+                    case (subcmd == "4B"):
+                        resultdata = func._get_dtcs(cmddata[0]);
+                        break;
+                    case (subcmd == "4C"):
+                        resultdata = func._get_vsc(cmddata[0]);
+                        break;
+                    case (subcmd == "52"):
+                        resultdata = func._get_dsql(cmddata[0]);
+                        break;
                     case (subcmd == "59"):
-                        resultdata = cmddata[0];
+                        resultdata = func._get_display_type(cmddata[0]);
                     break;
                 }
             break;
-            case (cmd == "29") :
-                switch (true) {
-                    case (cmddata[2] == "11"):
-                        band = func._get_band(cmddata[0]);
-                        cmddata = cmddata.splice(3);
-                        resultdata = func._get_display_content(band, cmddata);
-                    break;
-                    case (cmddata[2] == "12"):
-                        band = cmddata[0];
-                        cmddata = cmddata.splice(3);
 
-                        resultdata = JSON.stringify({
-                            'band'              : (band == "00") ? 0 : 1,
-                            'squelch_status'    : func._get_squelch_status(cmddata[0]),
-                            's_meter_lvl'       : func._get_s_meter_lvl([cmddata[1], cmddata[2]])
-                        });
-                    break;
-                }
-            break;
         }
 
         return JSON.stringify({'cmd': cmd, 'subcmd': subcmd , 'cmddata' : raw , 'cmdres': resultdata});
     },
-
-    // ##########################
-    // # Command Handling
-    // ##########################
-
 };

@@ -47,8 +47,6 @@ let response = {
                 r30.sel.R_BAND_A.show();
                 r30.sel.R_BAND_B.show();
 
-                r30.value.active_band[constant.BAND_A] = true;
-                r30.value.active_band[constant.BAND_B] = true;
             }
         }
     },
@@ -328,52 +326,106 @@ let response = {
 
         return true;
     },
+    earphone_mode :             function (data = null) {
+        if (data !== null) {
+            r30.value.earphone_mode = data;
+
+            if (data == constant.EARPHONE_MODE.OFF) {
+                r30.sel.R_EARPHONE_MODE.removeClass('icon-headphones');
+                r30.sel.R_EARPHONE_MODE.addClass('icon-volume-medium');
+                r30.sel.R_EARPHONE_MODE.prop('title', 'Speaker mode');
+
+            } else {
+                r30.sel.R_EARPHONE_MODE.addClass('icon-headphones');
+                r30.sel.R_EARPHONE_MODE.removeClass('icon-volume-medium');
+                r30.sel.R_EARPHONE_MODE.prop('title', 'Headphone mode');
+            }
+        }
+    },
+    antenna_mode :              function (data = null) {
+        if (data !== null) {
+            r30.value.antenna_mode = data;
+
+            if (data == constant.ANTENNA_MODE.EXTERNAL) {
+                r30.sel.R_ANTENNA_MODE.removeClass('icon-satellite-dish2');
+                r30.sel.R_ANTENNA_MODE.addClass('icon-station');
+                r30.sel.R_ANTENNA_MODE.prop('title', 'External Antenna');
+            } else {
+                r30.sel.R_ANTENNA_MODE.removeClass('icon-station');
+                r30.sel.R_ANTENNA_MODE.addClass('icon-satellite-dish2');
+                r30.sel.R_ANTENNA_MODE.prop('title', 'Internal Antenna');
+            }
+        }
+    },
     frequency :                 function (band = null, data = null, mem_name = null, receive_mode = null) {
         if (band == constant.BAND_A) {
+            r30.sel.R_A_FREQ_NAME.html('');
+            r30.sel.R_B_FREQ_NAME.html('');
+
             if (data !== null) {
-                r30.sel.R_A_FREQ_1.val(data[8]);
-                r30.sel.R_A_FREQ_2.val(data[9]);
-                r30.sel.R_A_FREQ_3.val(data[6]);
-                r30.sel.R_A_FREQ_4.val(data[7]);
-                r30.sel.R_A_FREQ_5.val(data[4]);
-                r30.sel.R_A_FREQ_6.val(data[5]);
-                r30.sel.R_A_FREQ_7.val(data[2]);
-                r30.sel.R_A_FREQ_8.val(data[3]);
-                r30.sel.R_A_FREQ_9.val(data[0]);
-                r30.sel.R_A_FREQ_10.val(data[1]);
+                r30.sel.R_A_FREQ_1.text('').text(data[8]);
+                r30.sel.R_A_FREQ_2.text('').text(data[9]);
+                r30.sel.R_A_FREQ_3.text('').text(data[6]);
+                r30.sel.R_A_FREQ_4.text('').text(data[7]);
+                r30.sel.R_A_FREQ_5.text('').text(data[4]);
+                r30.sel.R_A_FREQ_6.text('').text(data[5]);
+                r30.sel.R_A_FREQ_7.text('').text(data[2]);
+                r30.sel.R_A_FREQ_8.text('').text(data[3]);
+                r30.sel.R_A_FREQ_9.text('').text(data[0]);
+                r30.sel.R_A_FREQ_10.text('').text(data[1]);
+
+                count.a[1] = data[8];
+                count.a[2] = data[9];
+                count.a[3] = data[6];
+                count.a[4] = data[7];
+                count.a[5] = data[4];
+                count.a[6] = data[5];
+                count.a[7] = data[2];
+                count.a[8] = data[3];
+                count.a[9] = data[0];
+                count.a[10] = data[1];
             }
 
             if (mem_name !== null)      {
-                r30.sel.R_A_FREQ_NAME.html(mem_name);
-            } else {
-                r30.sel.R_A_FREQ_NAME.html('----------');
+                r30.sel.R_A_FREQ_NAME.html('').html(mem_name);
             }
 
             if (receive_mode !== null)  {
-                response.receive_mode(band, receive_mode);
+                response.receive_mode(constant.BAND_A, receive_mode);
             }
-        } else {
+        }
+
+        if (band == constant.BAND_B) {
             if (data !== null) {
-                r30.sel.R_B_FREQ_1.val(data[8]);
-                r30.sel.R_B_FREQ_2.val(data[9]);
-                r30.sel.R_B_FREQ_3.val(data[6]);
-                r30.sel.R_B_FREQ_4.val(data[7]);
-                r30.sel.R_B_FREQ_5.val(data[4]);
-                r30.sel.R_B_FREQ_6.val(data[5]);
-                r30.sel.R_B_FREQ_7.val(data[2]);
-                r30.sel.R_B_FREQ_8.val(data[3]);
-                r30.sel.R_B_FREQ_9.val(data[0]);
-                r30.sel.R_B_FREQ_10.val(data[1]);
+                r30.sel.R_B_FREQ_1.text('').text(data[8]);
+                r30.sel.R_B_FREQ_2.text('').text(data[9]);
+                r30.sel.R_B_FREQ_3.text('').text(data[6]);
+                r30.sel.R_B_FREQ_4.text('').text(data[7]);
+                r30.sel.R_B_FREQ_5.text('').text(data[4]);
+                r30.sel.R_B_FREQ_6.text('').text(data[5]);
+                r30.sel.R_B_FREQ_7.text('').text(data[2]);
+                r30.sel.R_B_FREQ_8.text('').text(data[3]);
+                r30.sel.R_B_FREQ_9.text('').text(data[0]);
+                r30.sel.R_B_FREQ_10.text('').text(data[1]);
+
+                count.b[1] = data[8];
+                count.b[2] = data[9];
+                count.b[3] = data[6];
+                count.b[4] = data[7];
+                count.b[5] = data[4];
+                count.b[6] = data[5];
+                count.b[7] = data[2];
+                count.b[8] = data[3];
+                count.b[9] = data[0];
+                count.b[10] = data[1];
             }
 
             if (mem_name !== null) {
-                r30.sel.R_B_FREQ_NAME.html(mem_name);
-            } else {
-                r30.sel.R_B_FREQ_NAME.html('----------');
+                r30.sel.R_B_FREQ_NAME.html('').html(mem_name);
             }
 
             if (receive_mode !== null)  {
-                response.receive_mode(band, receive_mode);
+                response.receive_mode(constant.BAND_B, receive_mode);
             }
         }
 
@@ -891,7 +943,7 @@ let response = {
 
     },
     scan_type :                 function (band = null, data = null) {
-        // TODO : response.js response.scan_type
+        // TODO : response.js response.scan_type https://github.com/Spotterday/Webinterface_ICOM_R30/issues/25
     },
     scan_condition :            function (data = null) {
         if (data !== null && data[constant.BAND_A] !== "" && data[constant.BAND_B] !== "") {
@@ -988,36 +1040,57 @@ let response = {
                 }
             }
         }
-
     },
     memory_group_name :         function (band = null, data = null) {
+
+        // TODO : Check Operation Mode
         // TODO : 0009 Returned 000 . because of auto mw
         if (band !== null) {
             if (data !== null) {
                 if (band == constant.BAND_A) {
-                    r30.sel.R_A_MEMORY_GROUP_NAME.html(r30.value.memory_banks[data.substring(2)]);
-                } else {
-                    r30.sel.R_B_MEMORY_GROUP_NAME.html(r30.value.memory_banks[data.substring(2)]);
+                    r30.sel.R_A_MEMORY_GROUP_NAME.html('').html(r30.value.memory_banks[data.substring(2)]);
                 }
-            } else {
-                if (band == constant.BAND_A) {
-                    r30.sel.R_A_MEMORY_GROUP_NAME.html('Unknown Bank');
-                } else {
-                    r30.sel.R_B_MEMORY_GROUP_NAME.html('Unknown Bank');
+
+                if (band == constant.BAND_B) {
+                    r30.sel.R_B_MEMORY_GROUP_NAME.html('').html(r30.value.memory_banks[data.substring(2)]);
                 }
             }
-        } else {
-            if (data !== null) {
-                if (r30.value.main_band == constant.BAND_A) {
-                    r30.sel.R_A_MEMORY_GROUP_NAME.html(r30.value.memory_banks[data.substring(2)]);
+        }
+
+        return true;
+    },
+    p_link_list :               function (data = null) {
+        function minTwoDigits(n) {
+            return (n < 10 ? '0' : '') + n;
+        }
+
+        let array = data.split(',');
+        let text = [];
+        let d = 1;
+
+        if (array.length === 161) {
+            r30.value.bank_counter = 0;
+            for (let i = 1; i <= 160; i++) {
+
+                text.push(String.fromCharCode('0x'+array[i]));
+
+                if (d == 16) {
+                    if (r30.value.bank_counter <= 9) {
+                        $('#R_MEMORY_BANK_P_LINK').append($('<option>', {
+                            value: minTwoDigits('PL_' + r30.value.bank_counter),
+                            text: minTwoDigits(r30.value.bank_counter) + ' : ' + text.join('')
+                        })).trigger('change');
+
+                        r30.value.p_link_banks[minTwoDigits(r30.value.bank_counter)] = text.join('');
+                    }
+
+                    r30.value.bank_counter++;
+
+                    text.splice(0,text.length);
+
+                    d = 1;
                 } else {
-                    r30.sel.R_B_MEMORY_GROUP_NAME.html(r30.value.memory_banks[data.substring(2)]);
-                }
-            } else {
-                if (r30.value.main_band == constant.BAND_A) {
-                    r30.sel.R_A_MEMORY_GROUP_NAME.html('Unknown Bank');
-                } else {
-                    r30.sel.R_B_MEMORY_GROUP_NAME.html('Unknown Bank');
+                    d++;
                 }
             }
         }

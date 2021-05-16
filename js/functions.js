@@ -179,6 +179,30 @@ module.exports = {
             }
         }
     },
+    _get_earphone_mode          : function (data = null) {
+        if (data !== null) {
+            switch (true) {
+                case (data == "00") :
+                    return 0;
+                case (data == "01") :
+                    return 1;
+                default:
+                    break;
+            }
+        }
+    },
+    _get_antenna_mode           : function (data = null) {
+        if (data !== null) {
+            switch (true) {
+                case (data == "00") :
+                    return 0;
+                case (data == "01") :
+                    return 1;
+                default:
+                    break;
+            }
+        }
+    },
     _get_afc                    : function (data = null) {
         if (data !== null) {
             switch (true) {
@@ -386,6 +410,58 @@ module.exports = {
     },
     _get_scan_type              : function (data = null) {
         // TODO : functions.js func._get_scan_type
+        if (data !== null) {
+            /**
+             [
+             '00', '00', '00', '00', '00',
+             '00', '00', '00', '00', '00',
+             '00', '00', '01', '01', '01',
+             '01', '7F', '7F', '1F', '00',
+             '00', '00', '00', '00', '00',
+             '00', '00', '00', '00', '00',
+             '00', '00', '00'
+             ]
+
+             [
+              0     1     2     3     4
+             '01', '01', '00', '00', '00',
+              5     6     7     8     9
+             '00', '00', '00', '00', '00',
+              10    11    12    13    14
+             '00', '00', '00', '00', '00',
+
+              15    x16    17    18    19
+             '01', '7F', '7F', '1F', '00',
+              20    21    22    23    24
+             '00', '00', '00', '00', '00',
+              25    26    27    28    29
+             '00', '00', '00', '00', '00',
+
+              x30    31    32
+             '00', '00', '00'
+             ]
+
+             */
+console.log(data[15]);
+            console.log(JSON.stringify({
+                vfo_all             : (data[0] == "01"),
+                vfo_band            : (data[1] == "01"),
+
+                mem_all             : (data[12] == "01"),   // 13
+                mem_mode            : (data[13] == "01"),   // 14
+                mem_near_station    : (data[14] == "01"),   // 15
+                mem_group_link      : (data[15] == "01"),   // 16
+
+                dup                 : (data[31] == "01"),   // 32
+                ton                 : (data[32] == "01")    // 33
+            }));
+
+            console.log('------------------------------------------');
+            console.log(data);
+            console.log('------------------------------------------');
+        }
+
+        return true;
     },
     _get_scan_condition         : function (data = null) {
         if (data !== null && (typeof data[1] !== "undefined" && data[1] !== "" && data[2] !== "")) {
@@ -525,9 +601,9 @@ module.exports = {
                 "rec"            : this._get_rec(data[15]),
                 "afc"            : this._get_afc(data[16]),
                 "skip_mode"      : this._get_skip_mode(data[17]),
-                "mem_group_nr"   : data[18]+data[19],
-                "mem_channel_nr" : data[20]+data[21],
-                "mem_name"       : this.hexToString(data[22]+data[23]+data[24]+data[25]+data[26]+data[27]+data[28]+data[29]+data[30]+data[31]+data[32]+data[33]+data[34]+data[35]+data[36]+data[37]),
+                "mem_group_nr"   : (data[18] !== null && data[19] !== null) ? data[18]+data[19] : null,
+                "mem_channel_nr" : (data[20] !== null && data[21] !== null) ? data[18]+data[19] : null,
+                "mem_name"       : this.hexToString(''+data[22]+data[23]+data[24]+data[25]+data[26]+data[27]+data[28]+data[29]+data[30]+data[31]+data[32]+data[33]+data[34]+data[35]+data[36]+data[37]),
                 "vsc"            : this._get_vsc(data[38]),
                 "tsql"           : (freq_mode == 7 || freq_mode == 8 || freq_mode == 9)      ?   this._get_tsql(data[39])                    : null,
                 "anl"            : (freq_mode == 3 || freq_mode == 4 || freq_mode == 5)      ?   this._get_anl(data[39])                     : null, // TODO : must be checked because of different modes
@@ -539,6 +615,9 @@ module.exports = {
     },
     _get_memory_group_name      : function (data = null) {
         // TODO : functions.js func._get_memory_group_name
+    },
+    _get_p_link_name            : function (data = null) {
+        // TODO : functions.js func._get_p_link_name
     },
     _get_noise_blanker_status   : function (data = null) {
         if (data !== null) {

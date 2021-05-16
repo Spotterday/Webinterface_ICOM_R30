@@ -63,27 +63,27 @@ let request = {
             let freq1, freq2, freq3, freq4, freq5, freq6, freq7, freq8, freq9, freq10;
 
             if (r30.value.main_band == constant.BAND_A) {
-                freq1 = r30.sel.R_A_FREQ_1.val().toString(16);
-                freq2 = r30.sel.R_A_FREQ_2.val().toString(16);
-                freq3 = r30.sel.R_A_FREQ_3.val().toString(16);
-                freq4 = r30.sel.R_A_FREQ_4.val().toString(16);
-                freq5 = r30.sel.R_A_FREQ_5.val().toString(16);
-                freq6 = r30.sel.R_A_FREQ_6.val().toString(16);
-                freq7 = r30.sel.R_A_FREQ_7.val().toString(16);
-                freq8 = r30.sel.R_A_FREQ_8.val().toString(16);
-                freq9 = r30.sel.R_A_FREQ_9.val().toString(16);
-                freq10 = r30.sel.R_A_FREQ_10.val().toString(16);
+                freq1 = r30.sel.R_A_FREQ_1.text().toString(16);
+                freq2 = r30.sel.R_A_FREQ_2.text().toString(16);
+                freq3 = r30.sel.R_A_FREQ_3.text().toString(16);
+                freq4 = r30.sel.R_A_FREQ_4.text().toString(16);
+                freq5 = r30.sel.R_A_FREQ_5.text().toString(16);
+                freq6 = r30.sel.R_A_FREQ_6.text().toString(16);
+                freq7 = r30.sel.R_A_FREQ_7.text().toString(16);
+                freq8 = r30.sel.R_A_FREQ_8.text().toString(16);
+                freq9 = r30.sel.R_A_FREQ_9.text().toString(16);
+                freq10 = r30.sel.R_A_FREQ_10.text().toString(16);
             } else {
-                freq1 = r30.sel.R_B_FREQ_1.val().toString(16);
-                freq2 = r30.sel.R_B_FREQ_2.val().toString(16);
-                freq3 = r30.sel.R_B_FREQ_3.val().toString(16);
-                freq4 = r30.sel.R_B_FREQ_4.val().toString(16);
-                freq5 = r30.sel.R_B_FREQ_5.val().toString(16);
-                freq6 = r30.sel.R_B_FREQ_6.val().toString(16);
-                freq7 = r30.sel.R_B_FREQ_7.val().toString(16);
-                freq8 = r30.sel.R_B_FREQ_8.val().toString(16);
-                freq9 = r30.sel.R_B_FREQ_9.val().toString(16);
-                freq10 = r30.sel.R_B_FREQ_10.val().toString(16);
+                freq1 = r30.sel.R_B_FREQ_1.text().toString(16);
+                freq2 = r30.sel.R_B_FREQ_2.text().toString(16);
+                freq3 = r30.sel.R_B_FREQ_3.text().toString(16);
+                freq4 = r30.sel.R_B_FREQ_4.text().toString(16);
+                freq5 = r30.sel.R_B_FREQ_5.text().toString(16);
+                freq6 = r30.sel.R_B_FREQ_6.text().toString(16);
+                freq7 = r30.sel.R_B_FREQ_7.text().toString(16);
+                freq8 = r30.sel.R_B_FREQ_8.text().toString(16);
+                freq9 = r30.sel.R_B_FREQ_9.text().toString(16);
+                freq10 = r30.sel.R_B_FREQ_10.text().toString(16);
             }
 
             // operation_mode = VFO
@@ -104,14 +104,14 @@ let request = {
                         r30.msg(false, 'Frequency ['+freq1+'.'+freq2+freq3+freq4+'.'+freq5+freq6+freq7+'.'+freq8+freq9+freq10+'] was set.');
                     } else {
                         // TODO : request last frequency to update input fields
-                        request.get.display_content(true);
+                        request.get.display_content(constant.BAND_A);
+                        request.get.display_content(constant.BAND_B);
+                        request.get.s_meter_v2(constant.BAND_A);
+                        request.get.s_meter_v2(constant.BAND_B);
                         r30.msg(true, 'Frequency ['+freq1+'.'+freq2+freq3+freq4+'.'+freq5+freq6+freq7+'.'+freq8+freq9+freq10+'] could not be set [Band Limit].');
                     }
                 }
-
-
             }
-
             return true;
         },
         scan_start :                function (scan_option = null) {
@@ -122,13 +122,13 @@ let request = {
                 // #################################################
                 if (settings[r30.value.main_band].operation_mode == constant.OPERATION_MODE.VFO) {
                     switch (true) {
-                        case (scan_option == 'AL') :
+                        case (scan_option == 'VFO-ALL') :
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x00'], 'timestamp' : r30.timestamp()}));
                             break;
-                        case (scan_option == 'BA') :
+                        case (scan_option == 'VFO-BAND') :
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x01'], 'timestamp' : r30.timestamp()}));
                             break;
-                        case (scan_option == 'TO') :
+                        case (scan_option == 'TONE') :
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x10'], 'timestamp' : r30.timestamp()}));
                             break;
                     }
@@ -139,16 +139,16 @@ let request = {
                 // #################################################
                 if (settings[r30.value.main_band].operation_mode == constant.OPERATION_MODE.MEM) {
                     switch (true) {
-                        case (scan_option.includes("AL")) :
+                        case (scan_option.includes("MEMORY-ALL")) :
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x04'], 'timestamp' : r30.timestamp()}));
                             break;
-                        case (scan_option.includes("MO")) :
+                        case (scan_option.includes("MEMORY-MODE")) :
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x05'], 'timestamp' : r30.timestamp()}));
                             break;
-                        case (scan_option.includes("NS")) :
+                        case (scan_option.includes("MEMORY-NEAR-STATION")) :
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x06'], 'timestamp' : r30.timestamp()}));
                             break;
-                        case (scan_option.includes("GL")) :
+                        case (scan_option.includes("MEMORY-GROUP-LINK")) :
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0A', '0x00'], 'data': ['0x00','0x07'], 'timestamp' : r30.timestamp()}));
                             break;
                         case (scan_option.includes("MB")) :
@@ -172,10 +172,14 @@ let request = {
                 settings[band].rec = true;
 
                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x09'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
+
+                r30.msg(false, 'Enable Recording.');
             } else {
                 settings[band].rec = false;
 
                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x09'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
+
+                r30.msg(false, 'Disable Recording.');
             }
 
             return true;
@@ -221,7 +225,7 @@ let request = {
                 36 : ['0x02','0x30'],
                 37 : ['0x02','0x37'],
                 38 : ['0x02','0x43'],
-                39 : ['0x02','0x50']
+                39 : ['0x02','0x55']
             };
 
             queue.add(JSON.stringify({'cmd':['0x14'], 'subcmd': '0x01', 'data': level_raw[af_level], 'timestamp' : r30.timestamp()}));
@@ -278,16 +282,24 @@ let request = {
                 settings[r30.value.main_band].receive_mode == constant.RECEIVE_MODE.LSB
             ) {
                 if (settings[r30.value.main_band].noise_blanker !== null) {
+
                     if (settings[r30.value.main_band].noise_blanker == constant.NOISE_BLANKER.ON) {
                         queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': '0x22', 'data': '0x00', 'timestamp' : r30.timestamp()}));
                         settings[r30.value.main_band].noise_blanker = constant.NOISE_BLANKER.OFF;
+
+                        r30.msg(false, "Noise Blanker [NB] set to [OFF].");
                     } else {
                         queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': '0x22', 'data': '0x01', 'timestamp' : r30.timestamp()}));
                         settings[r30.value.main_band].noise_blanker = constant.NOISE_BLANKER.ON;
+
+                        r30.msg(false, "Noise Blanker [NB] set to [ON].");
                     }
+
                 } else {
                     queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': '0x22', 'data': '0x01', 'timestamp' : r30.timestamp()}));
                     settings[r30.value.main_band].noise_blanker = constant.NOISE_BLANKER.ON;
+
+                    r30.msg(false, "Noise Blanker [NB] set to [ON].");
                 }
             } else {
                 r30.msg(true, "Noise Blanker [NB] only in CW and LSB usable.");
@@ -366,6 +378,7 @@ let request = {
         },
         tuning_step :               function (tuning_step = null) {
             if (tuning_step !== null) {
+                r30.msg(false, 'Set tuning step to ' + constant.TUNING_STEP[tuning_step] + ' for band '+ ((r30.value.main_band == constant.BAND_A) ? 'A' : 'B'));
                 queue.add(JSON.stringify({'cmd':['0x10'], 'subcmd': null, 'data': ['0x' + tuning_step], 'timestamp' : r30.timestamp()}));
             }
 
@@ -438,8 +451,10 @@ let request = {
                     queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': ['0x4A'], 'data': ['0x' + afc_status], 'timestamp' : r30.timestamp()}));
                 } else {
                     if (settings[r30.value.main_band].afc == constant.AFC.OFF) {
+                        r30.msg(false, 'AFC [ON].');
                         queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': ['0x4A'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
                     } else {
+                        r30.msg(false, 'AFC [OFF].');
                         queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': ['0x4A'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
                     }
                 }
@@ -531,13 +546,20 @@ let request = {
             if (band !== null) {
                 if (operation_mode !== null) {
                     settings[band].operation_mode = operation_mode;
+
                     queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x0'+operation_mode], 'timestamp' : r30.timestamp()}));
+
+                    r30.msg(false, 'Enable operation mode ['+operation_mode+'].');
+
+                    return true;
                 } else {
                     if (settings[band].operation_mode == constant.OPERATION_MODE.VFO) {
                         // Switch from VFO to Memory Mode
                         settings[band].operation_mode = constant.OPERATION_MODE.MEM;
 
                         queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
+
+                        r30.msg(false, 'Enable operation mode [MEM].');
 
                         return true;
                     }
@@ -549,11 +571,15 @@ let request = {
 
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x02'], 'timestamp' : r30.timestamp()}));
 
+                            r30.msg(false, 'Enable operation mode [WX].');
+
                             return true;
                         } else {
                             settings[band].operation_mode = constant.OPERATION_MODE.VFO;
 
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
+
+                            r30.msg(false, 'Enable operation mode [VFO].');
 
                             return true;
                         }
@@ -565,6 +591,8 @@ let request = {
 
                         queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
 
+                        r30.msg(false, 'Enable operation mode [VFO].');
+
                         return true;
                     }
                 }
@@ -574,6 +602,8 @@ let request = {
 
                     queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x0'+operation_mode], 'timestamp' : r30.timestamp()}));
 
+                    r30.msg(false, 'Enable operation mode ['+operation_mode+'].');
+
                     return true;
                 } else {
                     if (settings[r30.value.main_band].operation_mode == constant.OPERATION_MODE.VFO) {
@@ -581,6 +611,8 @@ let request = {
                         settings[r30.value.main_band].operation_mode = constant.OPERATION_MODE.MEM;
 
                         queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
+
+                        r30.msg(false, 'Enable operation mode [MEM].');
 
                         return true;
                     }
@@ -592,10 +624,14 @@ let request = {
 
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x02'], 'timestamp' : r30.timestamp()}));
 
+                            r30.msg(false, 'Enable operation mode [WX].');
+
                         } else {
                             settings[r30.value.main_band].operation_mode = constant.OPERATION_MODE.VFO;
 
                             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
+
+                            r30.msg(false, 'Enable operation mode [VFO].');
                         }
 
                         return true;
@@ -607,6 +643,8 @@ let request = {
 
                         queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
 
+                        r30.msg(false, 'Enable operation mode [VFO].');
+
                         return true;
                     }
                 }
@@ -615,12 +653,40 @@ let request = {
             return true;
         },
         audio_level_synchronize :   function () {
-            if (r30.value.audio_mode == 0) {
+            if (r30.value.audio_mode == constant.AUDIO_LEVEL_SYNCHRONIZE.LINKED) {
                 r30.msg(false, 'Audio level separate.');
+
                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x06', 'data': '0x01', 'timestamp' : r30.timestamp()}));
             } else {
                 r30.msg(false, 'Audio level synchronized.');
+
                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x06', 'data': '0x00', 'timestamp' : r30.timestamp()}));
+            }
+
+            return true;
+        },
+        earphone_mode :             function () {
+            if (r30.value.earphone_mode == constant.EARPHONE_MODE.OFF) {
+                r30.msg(false, 'Earphone mode [ON].');
+
+                queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x01'], 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
+            } else {
+                r30.msg(false, 'Earphone mode [OFF].');
+
+                queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x01'], 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
+            }
+
+            return true;
+        },
+        antenna_mode :              function () {
+            if (r30.value.antenna_mode == constant.ANTENNA_MODE.EXTERNAL) {
+                r30.msg(false, 'Antenna mode [INTERNAL].');
+
+                queue.add(JSON.stringify({'cmd':['0x12'], 'subcmd': null, 'data': ['0x01'], 'timestamp' : r30.timestamp()}));
+            } else {
+                r30.msg(false, 'Antenna mode [EXTERNAL].');
+
+                queue.add(JSON.stringify({'cmd':['0x12'], 'subcmd': null, 'data': ['0x00'], 'timestamp' : r30.timestamp()}));
             }
 
             return true;
@@ -640,91 +706,15 @@ let request = {
          * @param {null|number} band
          * @returns {boolean}
          */
-        display_content         : function (init = false, band = null) {
-            if (init == false) {
-                if (band == null) {
-                    if (r30.value.dual_band == true) {
-                        if (settings[constant.BAND_A].scan == true) {
-                            queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-                        }
-
-                        queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-
-                        if (settings[constant.BAND_B].scan == true) {
-                            queue.add(JSON.stringify({'cmd': ['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp': r30.timestamp()}));
-                        }
-
-                        queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                    } else {
-                        if (r30.value.main_band !== null) {
-                            if (r30.value.main_band == constant.BAND_A) {
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                            } else {
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                            }
-                        } else {
-                            queue.add(JSON.stringify({'cmd':['0x1A', '0x11'], 'subcmd': null, 'data': null, 'timestamp' : r30.timestamp()}));
-                        }
-                    }
-                } else {
-                    if (r30.value.dual_band == true) {
-                        if (settings[constant.BAND_A].scan == true) {
-                            queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-                        }
-
-                        queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-
-                        if (settings[constant.BAND_B].scan == true) {
-                            queue.add(JSON.stringify({'cmd': ['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp': r30.timestamp()}));
-                        }
-
-                        queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                    } else {
-                        if (r30.value.main_band !== null) {
-                            if (r30.value.main_band == constant.BAND_A) {
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                            } else {
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                                queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x12'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                            }
-                        } else {
-                            queue.add(JSON.stringify({'cmd':['0x1A', '0x11'], 'subcmd': null, 'data': null, 'timestamp' : r30.timestamp()}));
-                        }
-                    }
-                }
-            } else {
-                if (band == null) {
-                    queue.add(JSON.stringify({'cmd':['0x29', '0x00'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-
-                    queue.add(JSON.stringify({'cmd':['0x29', '0x01'], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-                } else {
-                    queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
-                }
-
+        display_content         : function (band = null) {
+            if (band !== null) {
+                queue.add(JSON.stringify({'cmd':['0x29', '0x0'+band], 'subcmd': ['0x1A', '0x11'], 'data': null, 'timestamp' : r30.timestamp()}));
             }
 
             return true;
         },
         duplex_setting          : function () {
+            // TODO : request.duplex_setting
             // FIXME : In single request not working
             // queue.add(JSON.stringify({'cmd':'0x0F', 'subcmd': null, 'data': null, 'timestamp' : r30.timestamp()}));
 
@@ -766,11 +756,11 @@ let request = {
             return true;
         },
         s_meter                 : function () {
-            queue.add(JSON.stringify({'cmd':'0x15', 'subcmd': '0x01', 'data': null, 'timestamp' : r30.timestamp()}));
+            queue.add(JSON.stringify({'cmd':['0x15'], 'subcmd': ['0x01'], 'data': null, 'timestamp' : r30.timestamp()}));
 
-            queue.add(JSON.stringify({'cmd':'0x15', 'subcmd': '0x02', 'data': null, 'timestamp' : r30.timestamp()}));
+            queue.add(JSON.stringify({'cmd':['0x15'], 'subcmd': ['0x02'], 'data': null, 'timestamp' : r30.timestamp()}));
 
-            queue.add(JSON.stringify({'cmd':'0x15', 'subcmd': '0x03', 'data': null, 'timestamp' : r30.timestamp()}));
+            queue.add(JSON.stringify({'cmd':['0x15'], 'subcmd': ['0x03'], 'data': null, 'timestamp' : r30.timestamp()}));
 
             return true;
         },
@@ -780,27 +770,47 @@ let request = {
             }
         },
         display_type            : function () {
-            queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': '0x59', 'data': null, 'timestamp' : r30.timestamp()}));
+            queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': ['0x59'], 'data': null, 'timestamp' : r30.timestamp()}));
 
             return true;
         },
         record_mode             : function () {
-            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x09', 'data': null, 'timestamp' : r30.timestamp()}));
+            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x09'], 'data': null, 'timestamp' : r30.timestamp()}));
 
             return true;
         },
         operation_mode          : function () {
-            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x04', 'data': null, 'timestamp' : r30.timestamp()}));
+            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x04'], 'data': null, 'timestamp' : r30.timestamp()}));
 
             return true;
         },
         audio_level_synchronize : function () {
-            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x06', 'data': null, 'timestamp' : r30.timestamp()}));
+            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x06'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+            return true;
+        },
+        noise_blanker_status    : function () {
+            queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': ['0x22'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+            return true;
+        },
+        earphone_mode           : function () {
+            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x01'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+            return true;
+        },
+        antenna_mode            : function () {
+            queue.add(JSON.stringify({'cmd':['0x12'], 'subcmd': null, 'data': null, 'timestamp' : r30.timestamp()}));
 
             return true;
         },
         anl                     : function () {
-            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': '0x00', 'data': null, 'timestamp' : r30.timestamp()}));
+            queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x00'], 'data': null, 'timestamp' : r30.timestamp()}));
+
+            return true;
+        },
+        vsc                     : function () {
+            queue.add(JSON.stringify({'cmd':['0x16'], 'subcmd': ['0x4C'], 'data': null, 'timestamp' : r30.timestamp()}));
 
             return true;
         },
@@ -820,7 +830,6 @@ let request = {
             }
 
             if (memory_bank_nr === null) {
-                // TODO : No return
 
                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0F','0x00'], 'data': ['0x00', '0x00', '0x00', '0x01', '0x00', '0x02', '0x00', '0x03', '0x00', '0x04', '0x00', '0x05', '0x00', '0x06', '0x00', '0x07', '0x00', '0x08', '0x00', '0x09', '0x00', '0x10', '0x00', '0x11', '0x00', '0x12', '0x00', '0x13', '0x00', '0x14'], 'timestamp' : r30.timestamp()}));
                 queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0F','0x00'], 'data': ['0x00', '0x15', '0x00', '0x16', '0x00', '0x17', '0x00', '0x18', '0x00', '0x19', '0x00', '0x20', '0x00', '0x21', '0x00', '0x22', '0x00', '0x23', '0x00', '0x24', '0x00', '0x25', '0x00', '0x26', '0x00', '0x27', '0x00', '0x28', '0x00', '0x29'], 'timestamp' : r30.timestamp()}));
@@ -835,6 +844,18 @@ let request = {
             }
 
             return true;
+        },
+        p_link_name             : function (p_link_nr = null) {
+            function minTwoDigits(n) {
+                return (n < 10 ? '0' : '') + n;
+            }
+
+            if (p_link_nr === null) {
+                queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0D','0x00'], 'data': ['0x00', '0x01', '0x02', '0x03', '0x04', '0x05', '0x06', '0x07', '0x08', '0x09'], 'timestamp' : r30.timestamp()}));
+            } else {
+                queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x0D','0x00'], 'data': ['0x'+minTwoDigits(p_link_nr)], 'timestamp' : r30.timestamp()}));
+            }
+
         },
         skip_mode               : function () {
             queue.add(JSON.stringify({'cmd':['0x1A'], 'subcmd': ['0x08'], 'data': null, 'timestamp' : r30.timestamp()}));

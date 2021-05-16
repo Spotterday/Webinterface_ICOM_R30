@@ -42,6 +42,9 @@ module.exports = {
                     case (subcmd == "00"):
                         resultdata = func._get_anl(cmddata[0]);
                     break;
+                    case (subcmd == "01") :
+                        resultdata = func._get_earphone_mode(cmddata[0]);
+                    break;
                     case (subcmd == "02") :
                         if (typeof cmddata !== 'undefined' && cmddata !== null && cmddata.length > 0 && cmddata[0] !== null) {
                             resultdata = func._get_receive_mode(cmddata);
@@ -101,9 +104,9 @@ module.exports = {
                             break;
                         }
                     break;
-                    case (cmd == "0C") :
-                        resultdata = func._get_scan_type(cmddata[0]);
-                        break;
+                    case (subcmd == "0C") :
+                        resultdata = func._get_scan_type(cmddata);
+                    break;
                 }
             break;
             case (cmd == "10") :
@@ -112,6 +115,9 @@ module.exports = {
             case (cmd == "11") :
                 resultdata = cmddata[0];
             break;
+            case (cmd == "12") :
+                resultdata = func._get_antenna_mode(cmddata);
+                break;
             case (cmd == "14") :
                 switch (true) {
                     case (subcmd == "01"):

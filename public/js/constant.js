@@ -5,6 +5,14 @@ let constant = {
         LINKED : 0,
         SEPARATE : 1,
     },
+    EARPHONE_MODE : {
+        OFF : 0,
+        ON : 1,
+    },
+    ANTENNA_MODE : {
+        EXTERNAL : 0,
+        INTERNAL : 1,
+    },
     RECORDING : {
         STOPPED : 0,
         PAUSE : 1,
@@ -48,6 +56,26 @@ let constant = {
         OFF : 0,
         SKIP : 1,
         PSKIP : 2
+    },
+    TUNING_STEP : {
+        0 : "0.01 kHz",
+        1 : "0.1 kHz",
+        2 : "1 kHz",
+        3 : "3.125 kHz",
+        4 : "5 kHz",
+        5 : "6.25 kHz",
+        6 : "8.33 kHz",
+        7 : "9 kHz",
+        8 : "10 kHz",
+        9 : "12.5 kHz",
+        10 : "15 kHz",
+        11 : "20 kHz",
+        12 : "25 kHz",
+        13 : "30 kHz",
+        14 : "50 kHz",
+        15 : "100 kHz",
+        16 : "125 kHz",
+        17 : "200 kHz"
     },
     VSC             : {
         OFF:0,

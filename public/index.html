@@ -39,7 +39,14 @@
 
 <!-- Boxed layout wrapper -->
 <div class="d-flex flex-column flex-1 layout-boxed">
-
+    <noscript>
+        <style type="text/css">
+            .noscriptmsg {background-color:#FF8A65; text-align: center;   padding: 10px;}
+        </style>
+        <div class="noscriptmsg">
+            You do not have Javascript enabled. Otherwise, the IC-R30 Remote Console will not work properly.
+        </div>
+    </noscript>
     <!-- Main navbar -->
     <div class="navbar navbar-expand-md navbar-light fixed-top">
         <div class="d-md-none">
@@ -100,37 +107,57 @@
                                         <div class="card mb-0" style="">
                                             <div class="input-group">
                                                 <span id="R_BAND_A_ACTIVE" class="input-group-prepend bg-green-300">
-                                                    <span class="input-group-text text-black font-weight-bold" style="font-size: 21px;">A</span>
+                                                    <span class="input-group-text text-black font-weight-bold cursor-pointer" style="font-size: 21px;">A</span>
                                                 </span>
 
-                                                <input type="text" id="R_A_FREQ_1" name="R_A_FREQ_1" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_A_FREQ_1" name="R_A_FREQ_1" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
                                                 <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
 
-                                                <input type="text" id="R_A_FREQ_2" name="R_A_FREQ_2" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_A_FREQ_2" name="R_A_FREQ_2" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
-                                                <input type="text" id="R_A_FREQ_3" name="R_A_FREQ_3" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_A_FREQ_3" name="R_A_FREQ_3" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
-                                                <input type="text" id="R_A_FREQ_4" name="R_A_FREQ_4" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
-
-                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
-
-                                                <input type="text" id="R_A_FREQ_5" name="R_A_FREQ_5" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
-
-                                                <input type="text" id="R_A_FREQ_6" name="R_A_FREQ_6" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
-
-                                                <input type="text" id="R_A_FREQ_7" name="R_A_FREQ_7" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_A_FREQ_4" name="R_A_FREQ_4" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
                                                 <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
 
-                                                <input type="text" id="R_A_FREQ_8" name="R_A_FREQ_8" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_A_FREQ_5" name="R_A_FREQ_5" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
-                                                <input type="text" id="R_A_FREQ_9" name="R_A_FREQ_9" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_A_FREQ_6" name="R_A_FREQ_6" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
-                                                <input type="text" id="R_A_FREQ_10" name="R_A_FREQ_10" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_A_FREQ_7" name="R_A_FREQ_7" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
+
+                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
+
+                                                <div id="R_A_FREQ_8" name="R_A_FREQ_8" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
+
+                                                <div id="R_A_FREQ_9" name="R_A_FREQ_9" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
+
+                                                <div id="R_A_FREQ_10" name="R_A_FREQ_10" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
                                                 <span class="input-group-append align-content-center">
-                                                    <select id="R_A_FREQ_MODE" style="font-size: 21px !important;" class="form-control select-search">
+                                                    <select id="R_A_FREQ_MODE" style="font-size: 21px !important;" class="form-control select-freq-mode">
                                                         <option value="1">LSB</option>
                                                         <option value="2">USB</option>
                                                         <option value="3">AM</option>
@@ -154,7 +181,7 @@
                                                 </span>
 
                                                 <span class="input-group-append align-content-center">
-                                                    <select id="R_A_TUNING_STEP" style="font-size: 21px;" class="form-control select-search">
+                                                    <select id="R_A_TUNING_STEP" style="font-size: 21px;" class="form-control select-tun-step">
                                                         <option value="0">0.01 kHz</option>
                                                         <option value="1">0.1 kHz</option>
                                                         <option value="2">1 kHz</option>
@@ -238,37 +265,57 @@
                                         <div class="card  mb-0" >
                                             <div class="input-group">
                                                 <span id="R_BAND_B_ACTIVE" class="input-group-prepend bg-light">
-                                                    <span class="input-group-text text-black font-weight-bold" style="font-size: 21px;">B</span>
+                                                    <span class="input-group-text text-black font-weight-bold cursor-pointer" style="font-size: 21px;">B</span>
                                                 </span>
 
-                                                <input type="text" id="R_B_FREQ_1" name="R_B_FREQ_1" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_B_FREQ_1" name="R_B_FREQ_1" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
                                                 <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
 
-                                                <input type="text" id="R_B_FREQ_2" name="R_B_FREQ_2" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_B_FREQ_2" name="R_B_FREQ_2" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
-                                                <input type="text" id="R_B_FREQ_3" name="R_B_FREQ_3" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_B_FREQ_3" name="R_B_FREQ_3" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
-                                                <input type="text" id="R_B_FREQ_4" name="R_B_FREQ_4" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
-
-                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
-
-                                                <input type="text" id="R_B_FREQ_5" name="R_B_FREQ_5" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
-
-                                                <input type="text" id="R_B_FREQ_6" name="R_B_FREQ_6" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
-
-                                                <input type="text" id="R_B_FREQ_7" name="R_B_FREQ_7" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_B_FREQ_4" name="R_B_FREQ_4" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
                                                 <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
 
-                                                <input type="text" id="R_B_FREQ_8" name="R_B_FREQ_8" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_B_FREQ_5" name="R_B_FREQ_5" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
-                                                <input type="text" id="R_B_FREQ_9" name="R_B_FREQ_9" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_B_FREQ_6" name="R_B_FREQ_6" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
-                                                <input type="text" id="R_B_FREQ_10" name="R_B_FREQ_10" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" class="form-control form-control-sm" style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                <div id="R_B_FREQ_7" name="R_B_FREQ_7" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
+
+                                                <div style="font-size: 21px; margin-top: 14px; line-height: normal" >.</div>
+
+                                                <div id="R_B_FREQ_8" name="R_B_FREQ_8" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
+
+                                                <div id="R_B_FREQ_9" name="R_B_FREQ_9" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
+
+                                                <div id="R_B_FREQ_10" name="R_B_FREQ_10" class="tp-col tp-min form-control form-control-sm"  style="flex: none; width: 55px; float: left !important; text-align: center; font-size: 21px;">
+                                                    <span class="tp-min-span" style="display: block;"  contenteditable="true" tabindex="0">0</span>
+                                                </div>
 
                                                 <span class="input-group-append align-content-center">
-                                                    <select id="R_B_FREQ_MODE" style="font-size: 21px;" class="form-control select-search">
+                                                    <select id="R_B_FREQ_MODE" style="font-size: 21px; " class="form-control select-freq-mode">
                                                         <option value="1">LSB</option>
                                                         <option value="2">USB</option>
                                                         <option value="3">AM</option>
@@ -292,7 +339,7 @@
                                                 </span>
 
                                                 <span class="input-group-append align-content-center">
-                                                    <select id="R_B_TUNING_STEP" style="font-size: 21px;" class="form-control select-search">
+                                                    <select id="R_B_TUNING_STEP" style="font-size: 21px;" class="form-control select-tun-step">
                                                         <option value="0">0.01 kHz</option>
                                                         <option value="1">0.1 kHz</option>
                                                         <option value="2">1 kHz</option>
@@ -375,34 +422,34 @@
                                     <div class="card-header bg-light border-bottom header-elements-sm-inline pt-1 pb-1">Actions</div>
 
                                     <div class="btn-group ">
-                                        <button id="R_BTN_REQ_UP" class="btn bg-grey-300"><i class="icon-arrow-up7 "></i></button>
-                                        <button id="R_BTN_REQ_DOWN" class="btn bg-grey-300"><i class="icon-arrow-down8"></i></button>
+                                        <button id="R_BTN_REQ_UP"           class="btn bg-grey-300" title="Up"><i class="icon-arrow-up7 "></i></button>
+                                        <button id="R_BTN_REQ_DOWN"         class="btn bg-grey-300" title="Down"><i class="icon-arrow-down8"></i></button>
                                     </div>
 
                                     <div class="btn-group pt-1">
-                                        <button id="R_BTN_REQ_SET" class="btn btn-primary">SET</button>
-                                        <button id="R_BTN_REQ_SINGLE_DUAL" class="btn btn-primary">SINGL / DUAL</button>
-                                        <button id="R_BTN_REQ_SWITCH_BAND" class="btn btn-primary">Switch Band</button>
-                                        <button id="R_BTN_REQ_SCAN" class="btn btn-primary">SCAN</button>
-                                        <button id="R_BTN_REQ_REC" class="btn btn-primary">REC</button>
-                                        <button id="R_BTN_REQ_VFO_MR_MX" class="btn btn-primary">VFO/MEM/MX</button>
+                                        <button id="R_BTN_REQ_SET"          class="btn btn-primary" title="Enter / Set Frequency">SET</button>
+                                        <button id="R_BTN_REQ_SINGLE_DUAL"  class="btn btn-primary" title="Single Band / Dual Band">SINGL / DUAL</button>
+                                        <button id="R_BTN_REQ_SWITCH_BAND"  class="btn btn-primary" title="Switch Band">Switch Band</button>
+                                        <button id="R_BTN_REQ_SCAN"         class="btn btn-primary" title="Start / Stop Scan">SCAN</button>
+                                        <button id="R_BTN_REQ_REC"          class="btn btn-primary" title="Start / Stop Recording">REC</button>
+                                        <button id="R_BTN_REQ_VFO_MR_MX"    class="btn btn-primary" title="Operation Mode">VFO/MEM/MX</button>
                                     </div>
 
                                     <div class="btn-group pt-1">
-                                        <button id="R_BTN_REQ_ATT" class="btn btn-primary" title="Attenuator">ATT</button>
-                                        <button id="R_BTN_REQ_NB" class="btn btn-primary" title="Noise blanker">NB</button>
-                                        <button id="R_BTN_REQ_T_SKIP" class="btn btn-primary">T-SKIP</button>
-                                        <button id="R_BTN_REQ_P_SKIP" class="btn btn-primary">P-SKIP</button>
-                                        <button id="R_BTN_REQ_ANL" class="btn btn-primary" title="Automatic Noise Limiter">ANL</button>
-                                        <button id="R_BTN_REQ_DUP" class="btn btn-primary" title="Duplex">DUP</button>
-                                        <button id="R_BTN_REQ_AFC" class="btn btn-primary" title="Automatic Frequency Control">AFC</button>
+                                        <button id="R_BTN_REQ_ATT"          class="btn btn-primary" title="Attenuator">ATT</button>
+                                        <button id="R_BTN_REQ_NB"           class="btn btn-primary" title="Noise blanker">NB</button>
+                                        <button id="R_BTN_REQ_T_SKIP"       class="btn btn-primary" title="Temporary Skip">T-SKIP</button>
+                                        <button id="R_BTN_REQ_P_SKIP"       class="btn btn-primary" title="Persistent Skip">P-SKIP</button>
+                                        <button id="R_BTN_REQ_ANL"          class="btn btn-primary" title="Automatic Noise Limiter">ANL</button>
+                                        <button id="R_BTN_REQ_DUP"          class="btn btn-primary" title="Duplex">DUP</button>
+                                        <button id="R_BTN_REQ_AFC"          class="btn btn-primary" title="Automatic Frequency Control">AFC</button>
                                     </div>
 
                                     <div class="btn-group pt-1">
-                                        <button id="R_BTN_REQ_AUDIO" class="btn btn-primary">Audio Mode</button>
-                                        <button id="R_BTN_REQ_VSC" class="btn btn-primary">VSC</button>
-                                        <button class="btn btn-primary"></button>
-                                        <button class="btn btn-primary"></button>
+                                        <button id="R_BTN_REQ_AUDIO"        class="btn btn-primary" title="Audio Synchronisation">Audio Mode</button>
+                                        <button id="R_BTN_REQ_VSC"          class="btn btn-primary" title="Voice Squelch Control">VSC</button>
+                                        <button id="R_EARPHONE_MODE"        class="btn btn-primary btn-icon top-0"></button>
+                                        <button id="R_ANTENNA_MODE"         class="btn btn-primary btn-icon top-0"></button>
                                         <button class="btn btn-primary"></button>
                                         <button class="btn btn-primary"></button>
                                     </div>
@@ -412,21 +459,24 @@
                                     <div class="card-header bg-light border-bottom header-elements-sm-inline pt-1 pb-1">Scan Options</div>
 
                                     <select id="R_SCAN_SELECT" style="font-size: 21px;" class="form-control select-search">
-                                        <optgroup label="Default Search Modes">
-                                            <option value="AL">ALL</option>
-                                            <option value="MO">MODE</option>
-                                            <option value="BA">BAND</option>
-                                            <option value="NS">Near Station</option>
-                                            <option value="AW">Auto MW</option>
-                                            <option value="TO">TONE</option>
-                                            <option value="GL">Group Link</option>
+                                        <optgroup label="Default Search Modes" id="R_DEFAULT_SEARCH_MODES">
+                                            <option value="VFO-ALL">VFO ALL scan</option>
+                                            <option value="VFO-BAND">VFO BAND scan</option>
+
+                                            <option value="MEMORY-ALL">Memory ALL scan</option>
+                                            <option value="MEMORY-MODE">Memory MODE scan</option>
+                                            <option value="MEMORY-NEAR-STATION">Memory near station scan</option>
+                                            <option value="MEMORY-GROUP-LINK">Memory group link scan</option>
+
+                                            <option value="DUP">DUP scan</option>
+                                            <option value="TONE">TONE scan</option>
                                         </optgroup>
 
                                         <optgroup label="Memory Group" id="R_MEMORY_BANK">
 
                                         </optgroup>
 
-                                        <optgroup label="P-Link" id="R_MEMORY_BANK_P_LINK">
+                                        <optgroup label="VFO P-LINK Scan" id="R_MEMORY_BANK_P_LINK">
 
                                         </optgroup>
                                             
@@ -442,10 +492,14 @@
                                     <table class="table table-bordered">
                                         <tbody>
                                             <tr>
-                                                <td><input type="text" class="form-control ion-pips-height-helper" id="R_AF_GAIN"></td>
+                                                <td>
+                                                    <input type="text" class="form-control ion-pips-height-helper" id="R_AF_GAIN">
+                                                </td>
                                             </tr>
                                             <tr>
-                                                <td><input type="text" class="form-control ion-pips-height-helper" id="R_RF_GAIN"></td>
+                                                <td>
+                                                    <input type="text" class="form-control ion-pips-height-helper" id="R_RF_GAIN">
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td><input type="text" class="form-control ion-pips-height-helper" id="R_SQUELCH_LEVEL"></td>
@@ -599,6 +653,7 @@
 </div>
 <!-- /boxed layout wrapper -->
 <script src="/socket.io/socket.io.js"></script>
+<script src="js/counter.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/constant.js"></script>
 <script src="js/queue.js"></script>

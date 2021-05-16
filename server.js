@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+
+
+
 // #################################################
 // # Required Libraries
 // # https://designswow.blogspot.com/p/reading-data-from-serial-port-with_15.html
@@ -7,7 +10,7 @@
 // #################################################
 
 // Change config directory, based on basedir
-process.env.NODE_CONFIG_DIR = "./config/";
+process.env["NODE_CONFIG_DIR"] = __dirname + "/config/";
 /** Library to get the current configuration **/
 const config        = require('config');
 /** Library to get the current os **/
@@ -53,6 +56,9 @@ const sql = require('./js/sql.js')
 
 let Clients = [];
 
+console.info(color.blueBright('[INFO] ') + 'NODE_CONFIG_ENV: ' + config.util.getEnv('NODE_CONFIG_ENV'));
+console.info(color.blueBright('[INFO] ') + 'NODE_CONFIG_DIR: ' + config.util.getEnv('NODE_CONFIG_DIR'));
+
 // ####################################################
 // # Create Sql Connection
 // ####################################################
@@ -75,6 +81,7 @@ let server = {
                 'debugweb'          : config.debug.web,
                 'usa'               : config.scanner.usa,
                 'serialbaudrate'    : config.scanner.serial.baudrate,
+                'notifications'     : config.server.http.notifications
             }));
 
             // ##########################
@@ -86,6 +93,17 @@ let server = {
                     let obj = JSON.parse(data);
 
                     req.init(obj.cmd, obj.subcmd, obj.data, server.serial);
+                }
+            });
+
+            /**
+             * Recieve SQL Commands
+             */
+            server.socket.on('execute_sql', function(data){
+                if (data !== null) {
+                    let obj = JSON.parse(data);
+
+                    sql.execute(obj.call, obj.data);
                 }
             });
 
@@ -143,7 +161,10 @@ let server = {
                 var result = fun.splitBuffer(data,253); // 253 => fd
 
                 result.forEach(function(hex, index, array)  {
-                    console.log(color.greenBright('[RECI]'), array[index].toString('hex').match(/.{1,2}/g).join(","))
+
+                    if (config.debug.server === true) {
+                        console.log(color.greenBright('[RECI]'), array[index].toString('hex').match(/.{1,2}/g).join(","))
+                    }
 
                     var multimode       = fun.extMultiMode(array[index]);
                     var band            = fun.extBand(array[index]);
@@ -152,7 +173,9 @@ let server = {
                     var cmddata         = fun.extData(cmd, array[index]);
                     var cmdmsg          = fun.extMsg(array[index]);
 
-                    console.log(color.magentaBright('[CONV]')+' CMD:' + cmd +' - SUB:'+ subcmd +' - DATA:'+ cmddata + ' - MSG:' + cmdmsg);
+                    if (config.debug.server === true) {
+                        console.log(color.magentaBright('[CONV]')+' CMD:' + cmd +' - SUB:'+ subcmd +' - DATA:'+ cmddata + ' - MSG:' + cmdmsg);
+                    }
 
                     // ##########################
                     // # Serial Response Handler
@@ -170,6 +193,7 @@ let server = {
                             'debugweb'          : config.debug.web,
                             'usa'               : config.scanner.usa,
                             'serialbaudrate'    : config.scanner.serial.baudrate,
+                            'notifications'     : config.server.http.notifications
                         }));
 
                         server.socket.emit('data', JSON.stringify({
@@ -264,7 +288,14 @@ let server = {
                     req.status_serial = true;
                     req.status_bluetooth = true;
 
-                    console.info(color.blueBright('[INFO]') + ' Serial port (' + config.server.devices.linux + ') opened');
+                    console.log(color.blueBright('[INFO]') + ' Serial port : ' + config.server.devices.linux);
+                    console.log(color.blueBright('[INFO]') + ' Serial baud rate : ' + config.scanner.serial.baudrate);
+                    console.log(color.blueBright('[INFO]') + ' Serial data bits : ' + config.scanner.serial.databits);
+                    console.log(color.blueBright('[INFO]') + ' Serial stop bits : ' + config.scanner.serial.stopbits);
+
+                    console.log(color.greenBright('-----------------------------------'));
+                    console.log(color.greenBright('----------- App started -----------'));
+                    console.log(color.greenBright('-----------------------------------'));
 
                     server.serial = serial;
                     server.onSerialConnect();
@@ -290,6 +321,16 @@ let server = {
                     lock: config.scanner.serial.lock,
                 });
 
+                SerialPort.list().then(ports => {
+                    console.log(color.yellowBright('--------- Available Ports ---------'));
+
+                    ports.forEach(function(port) {
+                        console.log(color.blueBright('[INFO] ') + port.path + ' - ' + port.pnpId + ' - ' + port.manufacturer);
+                    });
+
+                    console.log(color.yellowBright('-----------------------------------'));
+                });
+
                 // ##########################
                 // # Serial on Open Actions
                 // ##########################
@@ -297,7 +338,14 @@ let server = {
                     req.status_serial = true;
                     req.status_bluetooth = true;
 
-                    console.log(color.blueBright('[INFO]') + ' Serial port ('+config.server.devices.win+') opened');
+                    console.log(color.blueBright('[INFO]') + ' Serial port : ' + config.server.devices.win);
+                    console.log(color.blueBright('[INFO]') + ' Serial baud rate : ' + config.scanner.serial.baudrate);
+                    console.log(color.blueBright('[INFO]') + ' Serial data bits : ' + config.scanner.serial.databits);
+                    console.log(color.blueBright('[INFO]') + ' Serial stop bits : ' + config.scanner.serial.stopbits);
+
+                    console.log(color.greenBright('-----------------------------------'));
+                    console.log(color.greenBright('----------- App started -----------'));
+                    console.log(color.greenBright('-----------------------------------'));
 
                     server.serial = serial;
                     server.onSerialConnect();

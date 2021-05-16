@@ -55,7 +55,6 @@ let queue   = {
             }
         } else {
             // console.log('[QUEUE] No WebSocket provided.');
-
             return false;
         }
     },

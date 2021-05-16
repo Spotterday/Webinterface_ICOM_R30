@@ -12,6 +12,11 @@ let r30		= {
         R_AUDIO                     : $('#R_AUDIO'),
         R_SCAN_SELECT               : $('#R_SCAN_SELECT option'),
         R_QUEUE                     : $('#R_QUEUE'),
+        R_EARPHONE_MODE             : $('#R_EARPHONE_MODE'),
+        R_ANTENNA_MODE              : $('#R_ANTENNA_MODE'),
+        R_EARPHONE_MODE_BTN         : $('#R_EARPHONE_MODE_BTN'),
+        R_VERSION_WEB               : $('#R_VERSION_WEB'),
+        R_VERSION_SERVER            : $('#R_VERSION_SERVER'),
 
         R_A_AUDIO                        : $('#R_A_AUDIO'),
         R_BAND_A                        : $('#R_BAND_A'),
@@ -20,16 +25,16 @@ let r30		= {
         R_A_SKIP_OFF                    : $('#R_A_SKIP_OFF'),
         R_A_SKIP_SKIP                   : $('#R_A_SKIP_SKIP'),
         R_A_SKIP_PSKIP                  : $('#R_A_SKIP_PSKIP'),
-        R_A_FREQ_1                      : $('#R_A_FREQ_1'),
-        R_A_FREQ_2                      : $('#R_A_FREQ_2'),
-        R_A_FREQ_3                      : $('#R_A_FREQ_3'),
-        R_A_FREQ_4                      : $('#R_A_FREQ_4'),
-        R_A_FREQ_5                      : $('#R_A_FREQ_5'),
-        R_A_FREQ_6                      : $('#R_A_FREQ_6'),
-        R_A_FREQ_7                      : $('#R_A_FREQ_7'),
-        R_A_FREQ_8                      : $('#R_A_FREQ_8'),
-        R_A_FREQ_9                      : $('#R_A_FREQ_9'),
-        R_A_FREQ_10                     : $('#R_A_FREQ_10'),
+        R_A_FREQ_1                      : $('#R_A_FREQ_1>span'),
+        R_A_FREQ_2                      : $('#R_A_FREQ_2>span'),
+        R_A_FREQ_3                      : $('#R_A_FREQ_3>span'),
+        R_A_FREQ_4                      : $('#R_A_FREQ_4>span'),
+        R_A_FREQ_5                      : $('#R_A_FREQ_5>span'),
+        R_A_FREQ_6                      : $('#R_A_FREQ_6>span'),
+        R_A_FREQ_7                      : $('#R_A_FREQ_7>span'),
+        R_A_FREQ_8                      : $('#R_A_FREQ_8>span'),
+        R_A_FREQ_9                      : $('#R_A_FREQ_9>span'),
+        R_A_FREQ_10                     : $('#R_A_FREQ_10>span'),
         R_A_FREQ_ANL                    : $('#R_A_FREQ_ANL'),
         R_A_FREQ_MODE                   : $('#R_A_FREQ_MODE'),
         R_A_FREQ_NAME                   : $('#R_A_FREQ_NAME'),
@@ -58,16 +63,16 @@ let r30		= {
         R_B_SKIP_OFF                    : $('#R_B_SKIP_OFF'),
         R_B_SKIP_SKIP                   : $('#R_B_SKIP_SKIP'),
         R_B_SKIP_PSKIP                  : $('#R_B_SKIP_PSKIP'),
-        R_B_FREQ_1                      : $('#R_B_FREQ_1'),
-        R_B_FREQ_2                      : $('#R_B_FREQ_2'),
-        R_B_FREQ_3                      : $('#R_B_FREQ_3'),
-        R_B_FREQ_4                      : $('#R_B_FREQ_4'),
-        R_B_FREQ_5                      : $('#R_B_FREQ_5'),
-        R_B_FREQ_6                      : $('#R_B_FREQ_6'),
-        R_B_FREQ_7                      : $('#R_B_FREQ_7'),
-        R_B_FREQ_8                      : $('#R_B_FREQ_8'),
-        R_B_FREQ_9                      : $('#R_B_FREQ_9'),
-        R_B_FREQ_10                     : $('#R_B_FREQ_10'),
+        R_B_FREQ_1                      : $('#R_B_FREQ_1>span'),
+        R_B_FREQ_2                      : $('#R_B_FREQ_2>span'),
+        R_B_FREQ_3                      : $('#R_B_FREQ_3>span'),
+        R_B_FREQ_4                      : $('#R_B_FREQ_4>span'),
+        R_B_FREQ_5                      : $('#R_B_FREQ_5>span'),
+        R_B_FREQ_6                      : $('#R_B_FREQ_6>span'),
+        R_B_FREQ_7                      : $('#R_B_FREQ_7>span'),
+        R_B_FREQ_8                      : $('#R_B_FREQ_8>span'),
+        R_B_FREQ_9                      : $('#R_B_FREQ_9>span'),
+        R_B_FREQ_10                     : $('#R_B_FREQ_10>span'),
         R_B_FREQ_ANL                    : $('#R_B_FREQ_ANL'),
         R_B_FREQ_MODE                   : $('#R_B_FREQ_MODE'),
         R_B_FREQ_NAME                   : $('#R_B_FREQ_NAME'),
@@ -89,10 +94,7 @@ let r30		= {
         R_B_ATT_ATT2                      : $('#R_B_ATT_ATT2'),
         R_B_ATT_ATT3                      : $('#R_B_ATT_ATT3'),
 
-
-
         R_DEBUG                         : $("#R_DEBUG"),
-
         R_AF_GAIN                       : $('#R_AF_GAIN'),
         R_AF_GAIN_SLIDER                : null,
         R_RF_GAIN                       : $('#R_RF_GAIN'),
@@ -107,17 +109,16 @@ let r30		= {
     value   : {
         serialbaudrate      : 9600,
         usa                 : false,
-        active_band         : {
-            0 : false,
-            1 : false,
-        },
         dual_band           : false,    // Scanner in dual mode modus or single band modus
         main_band           : null,     // Which bank has main indication
         data_band           : null,     // For which bank is the data
         bank_counter        : 0,
         table_receive_log   : null,
         memory_banks        : {},
+        p_link_banks        : {},
         audio_mode          : 0,
+        earphone_mode       : 0,
+        antenna_mode        : 0,
     },
     // ##########################
     // # Functions
@@ -146,6 +147,13 @@ let r30		= {
 
                         r30.value.table_receive_log.draw( false );
                     }
+
+                    socket.emit('execute_sql', JSON.stringify({'call': 'history.create', 'data': {
+                            band : (band == constant.BAND_A) ? 'Band A' : 'Band B',
+                            freq : freq[8] + '.' + freq[9] + '' + freq[6] + '' + freq[7] + '.' + freq[4] + '' + freq[5] + '' + freq[2] + '.' + freq[3] + '' + freq[0] + '' + freq[1],
+                            freq_name : freq_name,
+                            timestamp : timestamp
+                        }}));
                 }
             } else {
                 return false;
@@ -221,9 +229,11 @@ let r30		= {
                 r30.status();
                 r30.audio();
 
+
                 queue.WebSocket = socket;
                 queue.start();
 
+                //request.get.scan_setting();
                 r30.init();
 
                 // TODO: URL automatically
@@ -231,6 +241,8 @@ let r30		= {
                     r30.sel.R_AUDIO.attr('src', 'http://192.168.10.9:8888/air.mp3?nocache=' + Math.floor((Math.random() * 1000000) + 1));
                 }, 1000);
             }, 500);
+
+            return true;
         });
     },
     reconnect   : function () {
@@ -268,7 +280,6 @@ let r30		= {
 
     },
     status      : function () {
-        // TODO : Change connection details from data section to status section
         socket.on('status', function (data = null) {
             if (data !== null) {
                 let obj = JSON.parse(data);
@@ -279,8 +290,8 @@ let r30		= {
 
                 r30.value.usa = obj.usa;
 
-                $('#R_VERSION_WEB').html(obj.versionweb);
-                $('#R_VERSION_SERVER').html(obj.versionserver);
+                r30.sel.R_VERSION_WEB.html(obj.versionweb);
+                r30.sel.R_VERSION_SERVER.html(obj.versionserver);
 
                 r30.value.serialbaudrate = obj.serialbaudrate;
 
@@ -338,7 +349,8 @@ let r30		= {
                 }
                 switch (true) {
                     case (obj.cmd == "FB") :
-                        request.get.display_content(false);
+                        request.get.display_content(constant.BAND_A);
+                        request.get.display_content(constant.BAND_B);
                     break;
                     case (obj.cmd == "00") :
                         response.frequency(r30.value.main_band, JSON.parse(obj.cmdres));
@@ -363,6 +375,9 @@ let r30		= {
                         break;
                     case (obj.cmd == "11") :
                         response.att(r30.value.main_band, obj.cmdres);
+                    break;
+                    case (obj.cmd == "12") :
+                        response.antenna_mode(obj.cmdres);
                     break;
                     case (obj.cmd == "14") :
                         switch (true) {
@@ -393,24 +408,53 @@ let r30		= {
                     break;
                     case (obj.cmd == "16") :
                         switch (true) {
-                            case (obj.subcmd == "4A"):
-                                response.afc(r30.value.main_band,obj.cmdres);
-                                break;
-                            case (obj.subcmd == "4C"):
-                                response.vsc(r30.value.main_band,obj.cmdres);
-                            break;
                             case (obj.subcmd == "22"):
                                 response.noise_blanker_status(r30.value.main_band,obj.cmdres);
                                 break;
+                            case (obj.subcmd == "43"):
+                                // TODO : 16 - 43 https://github.com/Spotterday/Webinterface_ICOM_R30/issues/20
+                                break;
+                            case (obj.subcmd == "4A"):
+                                response.afc(r30.value.main_band,obj.cmdres);
+                            break;
+                            case (obj.subcmd == "4B"):
+                                // TODO : 16 - 4B https://github.com/Spotterday/Webinterface_ICOM_R30/issues/19
+                            break;
+                            case (obj.subcmd == "4C"):
+                                response.vsc(r30.value.main_band,obj.cmdres);
+                            break;
+                            case (obj.subcmd == "52"):
+                                // TODO : 16 - 52 https://github.com/Spotterday/Webinterface_ICOM_R30/issues/21
+                            break;
                             case (obj.subcmd == "59"):
                                 // 00=Single band display, 01=Dual band display
                                 response.display_type(obj.cmdres);
-                                break;
+                            break;
+                            case (obj.subcmd == "5B"):
+                                // TODO : 16 - 5B https://github.com/Spotterday/Webinterface_ICOM_R30/issues/22
+                            break;
+                            case (obj.subcmd == "5F"):
+                                // TODO : 16 - 5B
+                            case (obj.subcmd == "60"):
+                            // TODO : 16 - 60
+                            case (obj.subcmd == "61"):
+                            // TODO : 16 - 61
+                            case (obj.subcmd == "62"):
+                            // TODO : 16 - 62
+                            case (obj.subcmd == "63"):
+                            // TODO : 16 - 63
+                            case (obj.subcmd == "64"):
+                            // TODO : 16 - 64
+                            break;
                         }
-                        break;
+                    break;
+                    case (obj.cmd == "18") :
+                        // TODO : 18 https://github.com/Spotterday/Webinterface_ICOM_R30/issues/23
+                    break;
                     case (obj.cmd == "19") :
                         // R30 => 9C
                     break;
+
                     case (obj.cmd == "0F") :
                         response.dup(r30.value.main_band, obj.cmdres);
                     break;
@@ -418,6 +462,9 @@ let r30		= {
                         switch (true) {
                             case (obj.subcmd == "00"):
                                 response.anl(r30.value.main_band, obj.cmdres);
+                            break;
+                            case (obj.subcmd == "01"):
+                                response.earphone_mode(obj.cmdres);
                             break;
                             case (obj.subcmd == "04"):
                                 response.operating_mode(r30.value.main_band, obj.cmdres);
@@ -465,15 +512,22 @@ let r30		= {
 
                                 // S-Meter show 2 bars but noting on CV-I - only squelch_status indication
                                 // That is an working workaround ;)
-                                if (data.s_meter_lvl == 0 && data.squelch_status == constant.SQUELCH_STATUS.OPEN) {
-                                    response.s_meter(data.band, 5);
-                                    response.squelch_status(data.band, data.squelch_status);
-                                } else {
+                                // TODO : (data.s_meter_lvl == 0 && data.squelch_status == constant.SQUELCH_STATUS.OPEN)
+                                //if (data.s_meter_lvl == 0 && data.squelch_status == constant.SQUELCH_STATUS.OPEN) {
+                                //    response.s_meter(data.band, 5);
+                                //    response.squelch_status(data.band, data.squelch_status);
+                                //} else {
                                     response.s_meter(data.band, data.s_meter_lvl);
                                     response.squelch_status(data.band, data.squelch_status);
-                                }
+                                //}
 
                             break;
+
+                            case (obj.subcmd == "13"):
+                                // TODO: 1A - 13 https://github.com/Spotterday/Webinterface_ICOM_R30/issues/28
+                                // TODO: 1A - 13 https://github.com/Spotterday/Webinterface_ICOM_R30/issues/29
+                            break;
+
                             case (obj.subcmd == "0B"):
                                 if (obj.cmdres !== null) {
                                     try {
@@ -485,15 +539,28 @@ let r30		= {
                                 }
                             break;
                             case (obj.subcmd == "0C"):
-                                // TODO: Scan Type not finished
+                                // TODO: 1A - 0C Scan Type not finished https://github.com/Spotterday/Webinterface_ICOM_R30/issues/25
+
                                 response.scan_type();
+                            break;
+                            case (obj.subcmd == "0D"):
+                                // TODO: 1A - 0D https://github.com/Spotterday/Webinterface_ICOM_R30/issues/26
+                                response.p_link_list(obj.cmddata);
+                            break;
+                            case (obj.subcmd == "0E"):
+                                // TODO: 1A - 0E https://github.com/Spotterday/Webinterface_ICOM_R30/issues/27
                             break;
                             case (obj.subcmd == "0F"):
                                 response.memory_group_list(obj.cmddata);
                             break;
                         }
                     break;
-
+                    case (obj.cmd == "1B") :
+                        // TODO : 1B
+                        break;
+                    case (obj.cmd == "20") :
+                        // TODO : 20
+                        break;
                 }
 
                 // Debug Messages
@@ -526,14 +593,25 @@ let r30		= {
             }],
             dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
             language: {
-                search: '<span>Filter:</span> _INPUT_',
-                searchPlaceholder: 'Type to filter...',
-                lengthMenu: '<span>Show:</span> _MENU_',
+                info:               '<p class="pl-2"><span>Showing page _PAGE_ of _PAGES_</span></p>',
+                infoEmpty:          '<p class="pl-2"><span>Showing 0 to 0 of 0 entries</span>',
+                search:             '<p class="pl-2"><span>Filter :</span> _INPUT_</p>',
+                searchPlaceholder:  'Type to filter...',
+                lengthMenu:         '<p class="pr-2"><span>Show :</span> _MENU_</p>',
                 paginate: { 'first': 'First', 'last': 'Last', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
             }
         });
 
         $('.select-search').select2();
+        $('.select-freq-mode').select2({
+            minimumResultsForSearch: Infinity,
+            width: 146
+        });
+        $('.select-tun-step').select2({
+            minimumResultsForSearch: Infinity,
+            width: 150
+        });
+
 
         r30.value.table_receive_log = $('#R_TABLE_RECEIVE_LOG').DataTable({
             "order": [[ 3, "desc" ]]
@@ -588,42 +666,7 @@ let r30		= {
         // #################################################
         // # Scoll events for frequency
         // #################################################
-        $(`input[name='R_A_FREQ_1'], input[name='R_A_FREQ_2'], input[name='R_A_FREQ_3'], input[name='R_A_FREQ_4'], input[name='R_A_FREQ_5'], input[name='R_A_FREQ_6'], input[name='R_A_FREQ_7'], input[name='R_A_FREQ_8'], input[name='R_A_FREQ_9'], input[name='R_A_FREQ_10'],input[name='R_B_FREQ_1'], input[name='R_B_FREQ_2'], input[name='R_B_FREQ_3'], input[name='R_B_FREQ_4'], input[name='R_B_FREQ_5'], input[name='R_B_FREQ_6'], input[name='R_B_FREQ_7'], input[name='R_B_FREQ_8'], input[name='R_B_FREQ_9'], input[name='R_B_FREQ_10']`).on("mousewheel", function(event, delta) {
-            // TODO : https://stackoverflow.com/a/15629039
-            // problem with Scroll down 9 => 0 results in 9 at 0
-            if (delta > 0)
-            {
-                if (this.value >= 9)
-                {
-                    this.value = -1;
-                }
-
-                this.value = parseInt(this.value) + 1;
-            }
-            else
-            {
-                if (parseInt(this.value) > 0)
-                {
-                    this.value = parseInt(this.value) - 1;
-                }
-
-                if (parseInt(this.value) == 0)
-                {
-                    this.value = 9;
-
-                }
-            }
-            return false;
-        });
-
-        $("input[name='R_A_FREQ_1'], input[name='R_A_FREQ_2'], input[name='R_A_FREQ_3'], input[name='R_A_FREQ_4'], input[name='R_A_FREQ_5'], input[name='R_A_FREQ_6'], input[name='R_A_FREQ_7'], input[name='R_A_FREQ_8'], input[name='R_A_FREQ_9'], input[name='R_A_FREQ_10'],input[name='R_B_FREQ_1'], input[name='R_B_FREQ_2'], input[name='R_B_FREQ_3'], input[name='R_B_FREQ_4'], input[name='R_B_FREQ_5'], input[name='R_B_FREQ_6'], input[name='R_B_FREQ_7'], input[name='R_B_FREQ_8'], input[name='R_B_FREQ_9'], input[name='R_B_FREQ_10']").on( "keydown", function (e) {
-            if ($.inArray(e.key, ["0","1","2","3","4","5","6","7","8","9"]) !== -1) {
-                this.value = e.key;
-                $(this).next().focus();
-            }
-        });
-
-        $(document).on('keypress',function(e) {
+        function send_freq(e) {
             if (e.key === "Enter") {
                 if (settings[r30.value.main_band].operation_mode == constant.OPERATION_MODE.VFO) {
                     request.set.frequency();
@@ -633,6 +676,452 @@ let r30		= {
                     request.set.frequency();
                 }
             }
+        }
+
+        $('#R_A_FREQ_1').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[1]=(count.a[1]==9?0:count.a[1]+=1);
+            } else {
+                count.a[1]=(count.a[1]==0?9:count.a[1]-=1);
+            }
+            $('#R_A_FREQ_1>span').html(count.a[1]<10?count.a[1]:count.a[1]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[1]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_1>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_2').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[2]=(count.a[2]==9?0:count.a[2]+=1);
+            } else {
+                count.a[2]=(count.a[2]==0?9:count.a[2]-=1);
+            }
+            $('#R_A_FREQ_2>span').html(count.a[2]<10?count.a[2]:count.a[2]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[2]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_2>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_3').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[3]=(count.a[3]==9?0:count.a[3]+=1);
+            } else {
+                count.a[3]=(count.a[3]==0?9:count.a[3]-=1);
+            }
+            $('#R_A_FREQ_3>span').html(count.a[3]<10?count.a[3]:count.a[3]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[3]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_3>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_4').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[4]=(count.a[4]==9?0:count.a[4]+=1);
+            } else {
+                count.a[4]=(count.a[4]==0?9:count.a[4]-=1);
+            }
+            $('#R_A_FREQ_4>span').html(count.a[4]<10?count.a[4]:count.a[4]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[4]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_4>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_5').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[5]=(count.a[5]==9?0:count.a[5]+=1);
+            } else {
+                count.a[5]=(count.a[5]==0?9:count.a[5]-=1);
+            }
+            $('#R_A_FREQ_5>span').html(count.a[5]<10?count.a[5]:count.a[5]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[5]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_5>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_6').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[6]=(count.a[6]==9?0:count.a[6]+=1);
+            } else {
+                count.a[6]=(count.a[6]==0?9:count.a[6]-=1);
+            }
+            $('#R_A_FREQ_6>span').html(count.a[6]<10?count.a[6]:count.a[6]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[6]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_6>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_7').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[7]=(count.a[7]==9?0:count.a[7]+=1);
+            } else {
+                count.a[7]=(count.a[7]==0?9:count.a[7]-=1);
+            }
+            $('#R_A_FREQ_7>span').html(count.a[7]<10?count.a[7]:count.a[7]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[7]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_7>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_8').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[8]=(count.a[8]==9?0:count.a[8]+=1);
+            } else {
+                count.a[8]=(count.a[8]==0?9:count.a[8]-=1);
+            }
+            $('#R_A_FREQ_8>span').html(count.a[8]<10?count.a[8]:count.a[8]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[8]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_8>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_9').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[9]=(count.a[9]==9?0:count.a[9]+=1);
+            } else {
+                count.a[9]=(count.a[9]==0?9:count.a[9]-=1);
+            }
+            $('#R_A_FREQ_9>span').html(count.a[9]<10?count.a[9]:count.a[9]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[9]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_9>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_A_FREQ_10').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.a[10]=(count.a[10]==9?0:count.a[10]+=1);
+            } else {
+                count.a[10]=(count.a[10]==0?9:count.a[10]-=1);
+            }
+            $('#R_A_FREQ_10>span').html(count.a[10]<10?count.a[10]:count.a[10]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.a[10]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_A_FREQ_10>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+
+        $('#R_B_FREQ_1').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[1]=(count.b[1]==9?0:count.b[1]+=1);
+            } else {
+                count.b[1]=(count.b[1]==0?9:count.b[1]-=1);
+            }
+            $('#R_B_FREQ_1>span').html(count.b[1]<10?count.b[1]:count.b[1]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[1]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_1>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_2').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[2]=(count.b[2]==9?0:count.b[2]+=1);
+            } else {
+                count.b[2]=(count.b[2]==0?9:count.b[2]-=1);
+            }
+            $('#R_B_FREQ_2>span').html(count.b[2]<10?count.b[2]:count.b[2]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[2]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_2>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_3').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[3]=(count.b[3]==9?0:count.b[3]+=1);
+            } else {
+                count.b[3]=(count.b[3]==0?9:count.b[3]-=1);
+            }
+            $('#R_B_FREQ_3>span').html(count.b[3]<10?count.b[3]:count.b[3]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[3]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_3>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_4').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[4]=(count.b[4]==9?0:count.b[4]+=1);
+            } else {
+                count.b[4]=(count.b[4]==0?9:count.b[4]-=1);
+            }
+            $('#R_B_FREQ_4>span').html(count.b[4]<10?count.b[4]:count.b[4]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[4]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_4>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_5').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[5]=(count.b[5]==9?0:count.b[5]+=1);
+            } else {
+                count.b[5]=(count.b[5]==0?9:count.b[5]-=1);
+            }
+            $('#R_B_FREQ_5>span').html(count.b[5]<10?count.b[5]:count.b[5]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[5]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_5>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_6').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[6]=(count.b[6]==9?0:count.b[6]+=1);
+            } else {
+                count.b[6]=(count.b[6]==0?9:count.b[6]-=1);
+            }
+            $('#R_B_FREQ_6>span').html(count.b[6]<10?count.b[6]:count.b[6]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[6]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_6>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_7').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[7]=(count.b[7]==9?0:count.b[7]+=1);
+            } else {
+                count.b[7]=(count.b[7]==0?9:count.b[7]-=1);
+            }
+            $('#R_B_FREQ_7>span').html(count.b[7]<10?count.b[7]:count.b[7]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[7]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_7>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_8').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[8]=(count.b[8]==9?0:count.b[8]+=1);
+            } else {
+                count.b[8]=(count.b[8]==0?9:count.b[8]-=1);
+            }
+            $('#R_B_FREQ_8>span').html(count.b[8]<10?count.b[8]:count.b[8]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[8]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_8>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_9').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[9]=(count.b[9]==9?0:count.b[9]+=1);
+            } else {
+                count.b[9]=(count.b[9]==0?9:count.b[9]-=1);
+            }
+            $('#R_B_FREQ_9>span').html(count.b[9]<10?count.b[9]:count.b[9]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[9]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_9>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        $('#R_B_FREQ_10').on('wheel', function(event){
+            // Prevents Page Scoll
+            event.preventDefault();
+
+            var oEvent = event.originalEvent,
+                delta  = oEvent.deltaY || oEvent.wheelDelta;
+
+            if (delta > 0) {
+                count.b[10]=(count.b[10]==9?0:count.b[10]+=1);
+            } else {
+                count.b[10]=(count.b[10]==0?9:count.b[10]-=1);
+            }
+            $('#R_B_FREQ_10>span').html(count.b[10]<10?count.b[10]:count.b[10]);
+        }).on('keydown', function(e) {
+            let key = e.which || e.keyCode;
+            if (key >= 48 && key <= 57 || key >= 96 && key <= 105) {
+                count.b[10]=parseInt(String.fromCharCode(e.keyCode));
+                $('#R_B_FREQ_10>span').text('').text(e.code);
+            } else {
+                e.preventDefault();
+            }
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+
+        $(document).on('keypress',function(e) {
+            send_freq(e);
         });
     },
     button      : function () {
@@ -649,9 +1138,28 @@ let r30		= {
             request.set.receive_mode(e.params.data.id);
         });
 
-        $('#R_RECONNECT_SWITCH').on( "click", function(){
-            request.set.on()
-            request.set.off();
+        $('#R_A_TUNING_STEP').on('select2:select', function (e) {
+            request.set.tuning_step(e.params.data.id);
+        });
+
+        $('#R_B_TUNING_STEP').on('select2:select', function (e) {
+            request.set.tuning_step(e.params.data.id);
+        });
+
+        $('#R_RECONNECT_SWITCH').on( "switchChange.bootstrapSwitch", function (event, state) {
+            if (state) {
+                socket.close();
+
+                r30.sel.R_BLUETOOTH_STATUS.removeClass('bg-success');
+                r30.sel.R_BLUETOOTH_STATUS.addClass('bg-danger');
+                r30.sel.R_BLUETOOTH_STATUS.html('Offline');
+
+                r30.sel.R_SERIAL_STATUS.removeClass('bg-success');
+                r30.sel.R_SERIAL_STATUS.addClass('bg-danger');
+                r30.sel.R_SERIAL_STATUS.html('Offline');
+            } else {
+                socket.connect();
+            }
         });
 
         $('#R_BTN_REQ_T_SKIP').on( "click", function(){
@@ -672,7 +1180,6 @@ let r30		= {
         });
 
         $('#R_BTN_REQ_SCAN').on( "click", function(){
-            // TODO : web.js r30.button.R_BTN_REQ_SCAN
             // #################################################
             // # VFO Mode
             // #################################################
@@ -680,10 +1187,10 @@ let r30		= {
 
                     if (settings[r30.value.main_band].scan == false) {
                         if (
-                            $('#R_SCAN_SELECT option').filter(':selected').val() === "AL" ||
+                            $('#R_SCAN_SELECT option').filter(':selected').val() === "VFO-ALL" ||
                             $('#R_SCAN_SELECT option').filter(':selected').val() === "AW" ||
-                            $('#R_SCAN_SELECT option').filter(':selected').val() === "BA" ||
-                            $('#R_SCAN_SELECT option').filter(':selected').val() === "TO"
+                            $('#R_SCAN_SELECT option').filter(':selected').val() === "VFO-BAND" ||
+                            $('#R_SCAN_SELECT option').filter(':selected').val() === "TONE"
                         ) {
                             settings[r30.value.main_band].scan = true;
 
@@ -737,10 +1244,11 @@ let r30		= {
                     let value = $('#R_SCAN_SELECT option').filter(':selected').val();
 
                     if (
-                        value === "AL" ||
-                        value === "MO" ||
-                        value === "NS" ||
-                        value === "GL" ||
+                        value === "VFO-ALL" ||
+                        value === "MEMORY-MODE" ||
+                        value === "MEMORY-NEAR-STATION" ||
+                        value === "MEMORY-GROUP-LINK" ||
+                        value === "MEMORY-ALL" ||
                         value.includes("MB")
                     ) {
                         settings[r30.value.main_band].scan = true;
@@ -795,15 +1303,54 @@ let r30		= {
 
         $('#R_BTN_REQ_VFO_MR_MX').on( "click", function(){
             request.set.operating_mode();
-            response.operating_mode();
+            request.get.tuning_step();
+        });
+
+        $('#R_EARPHONE_MODE').on( "click", function () {
+            request.set.earphone_mode();
+            request.get.earphone_mode();
+        });
+
+        $('#R_ANTENNA_MODE').on( "click", function () {
+            request.set.antenna_mode();
+            request.get.antenna_mode();
         });
 
         $('#R_BTN_REQ_REC').on( "click", function(){
-            request.set.recording(r30.value.main_band);
+            if (settings[r30.value.main_band].scan == false) {
+                request.set.recording(r30.value.main_band);
+                request.get.display_content(r30.value.main_band);
+            } else {
+                request.set.recording(r30.value.main_band);
+            }
         });
 
         $('#R_BTN_REQ_NB').on( "click", function(){
             request.set.noise_blanker_status();
+        });
+
+        $('#R_BAND_A_ACTIVE').on( "click", function(){
+            if (r30.value.main_band !== constant.BAND_A) {
+                request.set.band();
+                request.get.tuning_step();
+                request.get.af_gain_level();
+                request.get.rf_gain_level();
+                request.get.squelch_level();
+                request.get.scan_condition();
+                response.select_band();
+            }
+        });
+
+        $('#R_BAND_B_ACTIVE').on( "click", function(){
+            if (r30.value.main_band !== constant.BAND_B) {
+                request.set.band();
+                request.get.tuning_step();
+                request.get.af_gain_level();
+                request.get.rf_gain_level();
+                request.get.squelch_level();
+                request.get.scan_condition();
+                response.select_band();
+            }
         });
 
         $('#R_BTN_REQ_SWITCH_BAND').on( "click", function(){
@@ -820,7 +1367,8 @@ let r30		= {
             if (r30.value.dual_band == false) {
                 request.set.dual_band_mode();
 
-                request.get.display_content(true, null);
+                request.get.display_content(constant.BAND_A);
+                request.get.display_content(constant.BAND_B);
 
                 r30.value.dual_band = true;
 
@@ -838,7 +1386,7 @@ let r30		= {
         $('#R_BTN_REQ_UP').on( "click", function(){
             if (settings[r30.value.main_band].scan == false) {
                 request.set.up();
-                request.get.display_content(true, r30.value.main_band);
+                request.get.display_content(r30.value.main_band);
             } else {
                 request.set.up();
             }
@@ -848,7 +1396,7 @@ let r30		= {
         $('#R_BTN_REQ_DOWN').on( "click", function(){
             if (settings[r30.value.main_band].scan == false) {
                 request.set.down();
-                request.get.display_content(true, r30.value.main_band);
+                request.get.display_content(r30.value.main_band);
             } else {
                 request.set.down();
             }
@@ -866,7 +1414,12 @@ let r30		= {
     },
     init        : function () {
         if (socket.connected) {
-            request.get.display_content(true);
+
+            request.get.earphone_mode();
+            request.get.antenna_mode();
+            request.get.display_content(constant.BAND_A);
+            request.get.display_content(constant.BAND_B);
+            ///**
             request.get.af_gain_level();
             request.get.rf_gain_level();
             request.get.squelch_level();
@@ -875,6 +1428,12 @@ let r30		= {
             request.get.display_type();
             request.get.tuning_step();
             request.get.memory_group_name();
+
+            request.get.p_link_name();
+            request.get.display_content(constant.BAND_A);
+            request.get.display_content(constant.BAND_B);
+            // **/
+            //request.get.scan_type();
         } else {
             r30.msg(true,'Socket failed' + socket.connected);
         }

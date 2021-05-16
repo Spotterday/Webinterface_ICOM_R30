@@ -6,6 +6,15 @@ let sql		= {
     connected   : false,
     last_id     : null,
     data        : [],
+    _help       : function (functionName, context , args) {
+        var args = Array.prototype.slice.call(arguments, 2);
+        var namespaces = functionName.split(".");
+        var func = namespaces.pop();
+        for(var i = 0; i < namespaces.length; i++) {
+            context = context[namespaces[i]];
+        }
+        return context[func].apply(context, args);
+    },
     connect     : function () {
         sql.db = new sqlite3.Database('./db/r30.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
             if (err) {
@@ -36,6 +45,9 @@ let sql		= {
         });
 
         return this;
+    },
+    execute     : function (call = null, data = []) {
+        sql._help(call, sql, data);
     },
     create      : {
         ddl : function () {
@@ -111,7 +123,7 @@ let sql		= {
         getByFreq   :           function (frequencies_freq = '') {
 
         },
-        create      :           function (frequencies_freq = '', frequencies_mode = '') {
+        create      :           function (frequencies_freq = '', frequencies_mode = '', callback) {
             sql.db.run('INSERT INTO memory_frequencies (frequencies_freq, frequencies_mode) VALUES (?, ?)', [frequencies_freq, frequencies_mode], function(err) {
                 if (err) {
                     return console.log(err.message);
@@ -119,6 +131,7 @@ let sql		= {
                 // get the last insert id
                 console.log(`A row has been inserted with rowid ${this.lastID}`);
             });
+            //callback();
         },
         update      :           function (frequencies_id = 0, frequencies_freq = '', frequencies_mode = '') {
             sql.db.run('UPDATE memory_frequencies SET frequencies_freq = ?, frequencies_mode = ? WHERE frequencies_id = ?', [frequencies_freq, frequencies_mode, frequencies_id], function(err) {
@@ -171,14 +184,17 @@ let sql		= {
 
         },
         // TODO : sql.js sql.history.create
-        create : function (frequencies_freq = '') {
+        create : function (data = [], callback) {
+            console.log(data);
+           //callback();
+            /**
             sql.db.run('INSERT INTO history (memory_frequencies) VALUES (?)', [memory_frequencies], function(err) {
                 if (err) {
                     return console.log(err.message);
                 }
                 // get the last insert id
                 console.log(`A row has been inserted with rowid ${this.lastID}`);
-            });
+            });**/
         },
         // TODO : sql.js sql.history.delete
         delete : function (history_id = 0) {

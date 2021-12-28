@@ -107,6 +107,7 @@ let r30		= {
         R_LOG                           : $('#R_LOG'),
     },
     value   : {
+        loadProgress        : false,
         serialbaudrate      : 9600,
         usa                 : false,
         dual_band           : false,    // Scanner in dual mode modus or single band modus
@@ -249,6 +250,21 @@ let r30		= {
         socket.on('reconnect', function () {
 
         });
+    },
+    load        : function () {
+        if (r30.value.loadProgress == false) {
+            socket.emit('execute_load', JSON.stringify({'data': 'true'}));
+
+            r30.msg(false, 'Load initiated.');
+
+            r30.value.loadProgress = true
+        } else {
+            socket.emit('execute_load', JSON.stringify({'data': 'false'}));
+
+            r30.msg(false, 'Load stopped.');
+
+            r30.value.loadProgress = false
+        }
     },
     disconnect  : function () {
         socket.on('disconnect', function () {
@@ -699,7 +715,7 @@ let r30		= {
             } else {
                 e.preventDefault();
             }
-        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().next().children().focus(); else send_freq(e);});
         $('#R_A_FREQ_2').on('wheel', function(event){
             // Prevents Page Scoll
             event.preventDefault();
@@ -765,7 +781,7 @@ let r30		= {
             } else {
                 e.preventDefault();
             }
-        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().next().children().focus(); else send_freq(e);});
         $('#R_A_FREQ_5').on('wheel', function(event){
             // Prevents Page Scoll
             event.preventDefault();
@@ -831,7 +847,7 @@ let r30		= {
             } else {
                 e.preventDefault();
             }
-        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().next().children().focus(); else send_freq(e);});
         $('#R_A_FREQ_8').on('wheel', function(event){
             // Prevents Page Scoll
             event.preventDefault();
@@ -920,7 +936,7 @@ let r30		= {
             } else {
                 e.preventDefault();
             }
-        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().next().children().focus(); else send_freq(e);});
         $('#R_B_FREQ_2').on('wheel', function(event){
             // Prevents Page Scoll
             event.preventDefault();
@@ -986,7 +1002,7 @@ let r30		= {
             } else {
                 e.preventDefault();
             }
-        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().next().children().focus(); else send_freq(e);});
         $('#R_B_FREQ_5').on('wheel', function(event){
             // Prevents Page Scoll
             event.preventDefault();
@@ -1052,7 +1068,7 @@ let r30		= {
             } else {
                 e.preventDefault();
             }
-        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().children().focus(); else send_freq(e);});
+        }).on('keyup', function(e) {if (e.key !== "Enter") $(this).next().next().children().focus(); else send_freq(e);});
         $('#R_B_FREQ_8').on('wheel', function(event){
             // Prevents Page Scoll
             event.preventDefault();
@@ -1125,6 +1141,28 @@ let r30		= {
         });
     },
     button      : function () {
+        $('#R_BTN_REQ_LOAD').on( "click", function(){
+            request.set.scan_stop();
+
+            r30.load();
+
+            if (r30.value.dual_band == true) {
+                request.set.band(constant.BAND_A);
+
+                request.set.single_band_mode();
+
+                r30.value.dual_band = false;
+            }
+
+            for (let g = 0; g < 100; g++) {
+                request.set.memory_group(g);
+
+                for (let c = 0; c < 100; c++) {
+                    request.set.channel(c);
+                    request.get.display_content(0)
+                }
+            }
+        });
 
         $('#R_BTN_REQ_VSC').on( "click", function(){
             request.set.vsc();

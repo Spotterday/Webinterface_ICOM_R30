@@ -53,6 +53,8 @@ const req = require('./js/request.js')
 const res = require('./js/response.js')
 const fun = require('./js/functions.js')
 const sql = require('./js/sql.js')
+const Bluetooth = require("bluetooth-classic-serialport-client");
+const SerialPort = require("serialport");
 
 let Clients = [];
 
@@ -63,8 +65,14 @@ console.info(color.blueBright('[INFO] ') + 'NODE_CONFIG_DIR: ' + config.util.get
 // # Create Sql Connection
 // ####################################################
 let server = {
+    loadProgress: false,
     serial : null,
     socket : null,
+    onSocketDisconnect : function (ClientID) {
+        delete Clients[ClientID];
+
+        server.SerialDisconnect();
+    },
     onSocketConnect : function () {
         if (server.socket !== null) {
             Clients.push(server.socket);
@@ -84,17 +92,27 @@ let server = {
                 'notifications'     : config.server.http.notifications
             }));
 
+            server.socket.on('execute_load', function(){
+                if (server.loadProgress === false) {
+                    server.loadProgress = true;
+                } else {
+                    server.loadProgress = false;
+                }
+            });
+
             // ##########################
             // # Socket Data Request
             // ##########################
-
             server.socket.on('execute', function(data){
                 if (data !== null) {
                     let obj = JSON.parse(data);
 
-                    req.init(obj.cmd, obj.subcmd, obj.data, server.serial);
+                    if (typeof server !== "undefined" && typeof server.serial !== "undefined" && server.serial !== null) {
+                        req.init(obj.cmd, obj.subcmd, obj.data, server.serial);
+                    }
                 }
             });
+
 
             /**
              * Recieve SQL Commands
@@ -112,11 +130,11 @@ let server = {
             // ##########################
 
             server.socket.on('disconnect', function(){
-                var i = Clients.indexOf(server.socket);
+                let i = Clients.indexOf(server.socket);
 
                 console.log(color.yellowBright('[DISC] ') +'Disconnect : ', server.socket.handshake.address);
 
-                delete Clients[i];
+                server.onSocketDisconnect(i);
             });
 
             server.socket.on('close', function () {
@@ -136,6 +154,10 @@ let server = {
                 console.log(color.redBright('[INFO] ') +'Socket Server closed');
             });
 
+            if (server.serial == null) {
+                server.SerialConnect();
+            }
+
             /**
              * https://github.com/meldron/node-alsa-capture
              * */
@@ -153,6 +175,12 @@ let server = {
                 console.error(error);
             });
             */
+        }
+    },
+    onSerialDisconnect : function () {
+        if (server.serial !== null) {
+            server.serial.close();
+            server.serial = null;
         }
     },
     onSerialConnect : function () {
@@ -233,6 +261,109 @@ let server = {
 
         process.exit();
     },
+    SerialConnect : function () {
+        if (os.platform() === 'linux') {
+            /** Library to get a serial port handling under linux **/
+            var Bluetooth = require('bluetooth-classic-serialport-client');
+
+            // ##########################
+            // # Serial Linux Init
+            // ##########################
+            var serial = new Bluetooth();
+
+            // ##########################
+            // # Serial on Connect / Open Action
+            // ##########################
+            serial.connect(config.scanner.hwmac).then(function () {
+                req.status_serial = true;
+                req.status_bluetooth = true;
+
+                console.log(color.blueBright('[INFO]') + ' Serial port : ' + config.server.devices.linux);
+                console.log(color.blueBright('[INFO]') + ' Serial baud rate : ' + config.scanner.serial.baudrate);
+                console.log(color.blueBright('[INFO]') + ' Serial data bits : ' + config.scanner.serial.databits);
+                console.log(color.blueBright('[INFO]') + ' Serial stop bits : ' + config.scanner.serial.stopbits);
+
+                console.log(color.greenBright('-----------------------------------'));
+                console.log(color.greenBright('----------- App started -----------'));
+                console.log(color.greenBright('-----------------------------------'));
+
+                server.serial = serial;
+                server.onSerialConnect();
+
+            }).catch(function (err) {
+                req.status_serial = false;
+                req.status_bluetooth = false;
+
+                console.error(color.redBright('[FAILED]') + ' Error: ', err)
+            })
+        } else {
+            const SerialPort = require("serialport");
+
+            // ##########################
+            // # Serial Windows Init
+            // ##########################
+            const serial = new SerialPort(config.server.devices.win, {
+                baudRate: config.scanner.serial.baudrate,
+                dataBits: config.scanner.serial.databits,
+                autoOpen: config.scanner.serial.autoopen,
+                stopBits: config.scanner.serial.stopbits,
+                parity: config.scanner.serial.parity,
+                lock: config.scanner.serial.lock,
+            });
+
+            SerialPort.list().then(ports => {
+                console.log(color.yellowBright('--------- Available Ports ---------'));
+
+                ports.forEach(function(port) {
+                    console.log(color.blueBright('[INFO] ') + port.path + ' - ' + port.pnpId + ' - ' + port.manufacturer);
+                });
+
+                console.log(color.yellowBright('-----------------------------------'));
+            });
+
+            // ##########################
+            // # Serial on Open Actions
+            // ##########################
+            serial.on('open', function () {
+                req.status_serial = true;
+                req.status_bluetooth = true;
+
+                console.log(color.blueBright('[INFO]') + ' Serial port : ' + config.server.devices.win);
+                console.log(color.blueBright('[INFO]') + ' Serial baud rate : ' + config.scanner.serial.baudrate);
+                console.log(color.blueBright('[INFO]') + ' Serial data bits : ' + config.scanner.serial.databits);
+                console.log(color.blueBright('[INFO]') + ' Serial stop bits : ' + config.scanner.serial.stopbits);
+
+                console.log(color.greenBright('-----------------------------------'));
+                console.log(color.greenBright('----------- App started -----------'));
+                console.log(color.greenBright('-----------------------------------'));
+
+                server.serial = serial;
+                server.onSerialConnect();
+            });
+
+            // ##########################
+            // # Serial on Error Actions
+            // ##########################
+            serial.on('error', function (data) {
+                req.status_serial = false;
+                req.status_bluetooth = false;
+                console.log(color.redBright('[FAILED] ') + data);
+            })
+
+            // ##########################
+            // # Serial on Close Action
+            // ##########################
+            serial.on('close', function () {
+                req.status_bluetooth = false;
+                req.status_serial = false;
+
+                console.log(color.blueBright('[INFO]') + ' Serial port (' + config.server.devices.win + ') closed');
+            })
+        }
+    },
+    SerialDisconnect : function () {
+        server.onSerialDisconnect()
+    },
     init : function () {
         if (sql.connect()) {
             sql.web.get();
@@ -272,104 +403,7 @@ let server = {
             // ####################################################
             // # Serial Connect OS specific actions
             // ####################################################
-            if (os.platform() === 'linux') {
-                /** Library to get a serial port handling under linux **/
-                const Bluetooth = require('bluetooth-classic-serialport-client');
-
-                // ##########################
-                // # Serial Linux Init
-                // ##########################
-                var serial = new Bluetooth();
-
-                // ##########################
-                // # Serial on Connect / Open Action
-                // ##########################
-                serial.connect(config.scanner.hwmac).then(function () {
-                    req.status_serial = true;
-                    req.status_bluetooth = true;
-
-                    console.log(color.blueBright('[INFO]') + ' Serial port : ' + config.server.devices.linux);
-                    console.log(color.blueBright('[INFO]') + ' Serial baud rate : ' + config.scanner.serial.baudrate);
-                    console.log(color.blueBright('[INFO]') + ' Serial data bits : ' + config.scanner.serial.databits);
-                    console.log(color.blueBright('[INFO]') + ' Serial stop bits : ' + config.scanner.serial.stopbits);
-
-                    console.log(color.greenBright('-----------------------------------'));
-                    console.log(color.greenBright('----------- App started -----------'));
-                    console.log(color.greenBright('-----------------------------------'));
-
-                    server.serial = serial;
-                    server.onSerialConnect();
-
-                }).catch(function (err) {
-                    req.status_serial = false;
-                    req.status_bluetooth = false;
-
-                    console.error(color.redBright('[FAILED]') + ' Error: ', err)
-                })
-            } else {
-                const SerialPort = require("serialport");
-
-                // ##########################
-                // # Serial Windows Init
-                // ##########################
-                const serial = new SerialPort(config.server.devices.win, {
-                    baudRate: config.scanner.serial.baudrate,
-                    dataBits: config.scanner.serial.databits,
-                    autoOpen: config.scanner.serial.autoopen,
-                    stopBits: config.scanner.serial.stopbits,
-                    parity: config.scanner.serial.parity,
-                    lock: config.scanner.serial.lock,
-                });
-
-                SerialPort.list().then(ports => {
-                    console.log(color.yellowBright('--------- Available Ports ---------'));
-
-                    ports.forEach(function(port) {
-                        console.log(color.blueBright('[INFO] ') + port.path + ' - ' + port.pnpId + ' - ' + port.manufacturer);
-                    });
-
-                    console.log(color.yellowBright('-----------------------------------'));
-                });
-
-                // ##########################
-                // # Serial on Open Actions
-                // ##########################
-                serial.on('open', function () {
-                    req.status_serial = true;
-                    req.status_bluetooth = true;
-
-                    console.log(color.blueBright('[INFO]') + ' Serial port : ' + config.server.devices.win);
-                    console.log(color.blueBright('[INFO]') + ' Serial baud rate : ' + config.scanner.serial.baudrate);
-                    console.log(color.blueBright('[INFO]') + ' Serial data bits : ' + config.scanner.serial.databits);
-                    console.log(color.blueBright('[INFO]') + ' Serial stop bits : ' + config.scanner.serial.stopbits);
-
-                    console.log(color.greenBright('-----------------------------------'));
-                    console.log(color.greenBright('----------- App started -----------'));
-                    console.log(color.greenBright('-----------------------------------'));
-
-                    server.serial = serial;
-                    server.onSerialConnect();
-                });
-
-                // ##########################
-                // # Serial on Error Actions
-                // ##########################
-                serial.on('error', function (data) {
-                    req.status_serial = false;
-                    req.status_bluetooth = false;
-                    console.log(color.redBright('[FAILED] ') + data);
-                })
-
-                // ##########################
-                // # Serial on Close Action
-                // ##########################
-                serial.on('close', function () {
-                    req.status_bluetooth = false;
-                    req.status_serial = false;
-
-                    console.log(color.blueBright('[INFO]') + ' Serial port (' + config.server.devices.win + ') closed');
-                })
-            }
+            server.SerialConnect();
         }
     }
 };
@@ -378,7 +412,7 @@ server.init();
 
 
 process.on('exit',      function () {
-    //onProcessTerminate();
+    server.onProcessTerminate();
 });
 process.on('SIGUSR1',   function () {
     server.onProcessTerminate();

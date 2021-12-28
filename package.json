@@ -1,6 +1,6 @@
 {
   "name": "ic-r30",
-  "version": "1.5.6",
+  "version": "1.6.0",
   "description": "Remote Control for Icom IC-R30",
   "homepage": "https://www.spotterday.de",
   "main": "server.js",
@@ -19,7 +19,7 @@
   "license": "ISC",
   "engineStrict": true,
   "engines": {
-    "npm": ">=6.0.0",
+    "npm": ">=8.3.0",
     "node": ">=14"
   },
   "pkg": {
@@ -46,16 +46,16 @@
   "dependencies": {
     "bluetooth-classic-serialport-client": "0.1.25",
     "buffer": "6.0.3",
-    "chalk": "4.1.0",
+    "chalk": "4.1.2",
     "config": "3.3.6",
     "express": "4.17.1",
     "jquery-mousewheel": "3.1.13",
-    "os": "0.1.1",
-    "serialport": "9.0.7",
-    "socket.io": "4.0.1",
+    "os": "0.1.2",
+    "serialport": "9.2.8",
+    "socket.io": "4.4.0",
     "sqlite3": "5.0.2"
   },
   "devDependencies": {
-    "pkg": "^5.0.0"
+    "pkg": "^5.5.1"
   }
 }

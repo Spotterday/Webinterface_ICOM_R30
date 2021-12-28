@@ -20,27 +20,33 @@ let request = {
 
             return true;
         },
-        band :                      function () {
-            if (r30.value.main_band == constant.BAND_A) {
+        band :                      function (Band = null) {
+            if (Band == null) {
+                if (r30.value.main_band == constant.BAND_A) {
 
-                queue.add(JSON.stringify({'cmd':['0x07'], 'subcmd': '0xD1', 'data': null, 'timestamp' : r30.timestamp()}));
+                    queue.add(JSON.stringify({'cmd':['0x07'], 'subcmd': '0xD1', 'data': null, 'timestamp' : r30.timestamp()}));
 
-                r30.msg(false, 'Switch Band to B initiated.');
+                    r30.msg(false, 'Switch Band to B initiated.');
 
-                if (settings[constant.BAND_B].scan === false) {
-                    r30.value.main_band = constant.BAND_B;
+                    if (settings[constant.BAND_B].scan === false) {
+                        r30.value.main_band = constant.BAND_B;
+                    }
+
+                } else {
+
+                    queue.add(JSON.stringify({'cmd':['0x07'], 'subcmd': '0xD0', 'data': null, 'timestamp' : r30.timestamp()}));
+
+                    r30.msg(false, 'Switch Band to A initiated.');
+
+                    if (settings[constant.BAND_A].scan === false) {
+                        r30.value.main_band = constant.BAND_A;
+                    }
+
                 }
-
             } else {
-
                 queue.add(JSON.stringify({'cmd':['0x07'], 'subcmd': '0xD0', 'data': null, 'timestamp' : r30.timestamp()}));
 
                 r30.msg(false, 'Switch Band to A initiated.');
-
-                if (settings[constant.BAND_A].scan === false) {
-                    r30.value.main_band = constant.BAND_A;
-                }
-
             }
 
             return true;
